@@ -24,6 +24,7 @@ var globalPauseCount int
 
 var globalLogFile *os.File
 var globalCutFile *os.File
+var globalListFile *os.File
 
 func PlayTest() {
 	f, err := os.Open("test.mp3")
@@ -63,16 +64,12 @@ func PlayTest() {
 			break
 		} else if c == 108 { // L
 			speaker.Lock()
-			//globalTo = streamer.Position()
 			streamer.Seek(streamer.Position() + 100000)
-			//WritePlayDuration()
 			globalFrom = streamer.Position()
 			speaker.Unlock()
 		} else if c == 106 { // J
 			speaker.Lock()
-			//globalTo = streamer.Position()
 			streamer.Seek(streamer.Position() - 100000)
-			//WritePlayDuration()
 			globalFrom = streamer.Position()
 			speaker.Unlock()
 		} else if c == 107 || c == 32 { // K or space
@@ -92,16 +89,6 @@ func PlayTest() {
 
 }
 
-// played for 4.3 seconds, from 0 to 11101010 pos
-// paused for 8.2 second
-// played for 16.17 seconds, from 21101010 to 31101010 pos
-// advanced to pos 41101010
-// played for 0.01 seconds, from 41101010 to 41101011 pos
-// advanced to pos 51101010
-// played for 0.02 seconds, from 51101010 to 51101012 pos
-// played for 13.6 seconds, from 51101012 to 61101012 pos
-// paused for 9 seconds
-
 func WritePlayDuration() {
 	playDuration := float64(globalCount-globalCountLast) / 1000.0
 	fs := PositionAsSeconds(globalFrom)
@@ -109,6 +96,7 @@ func WritePlayDuration() {
 	globalLogFile.WriteString(fmt.Sprintf("played for %f, from %s to %s\n", playDuration, fs, ts))
 	cut := fmt.Sprintf("ffmpeg -i test.mp3 -ss %s -to %s play%d.mp3\n", fs, ts, globalPlayCount)
 	globalCutFile.WriteString(cut)
+	globalListFile.WriteString(fmt.Sprintf("file 'play%d.mp3'\n", globalPlayCount))
 	globalPlayCount++
 	globalCountLast = globalCount
 }
@@ -124,10 +112,13 @@ func WritePlayDuration() {
 func RecordEverything() {
 	os.Remove("log.txt")
 	os.Remove("cut.sh")
+	os.Remove("list.txt")
 	globalLogFile, _ = os.OpenFile("log.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	globalCutFile, _ = os.OpenFile("cut.sh", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	globalListFile, _ = os.OpenFile("list.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	defer globalLogFile.Close()
 	defer globalCutFile.Close()
+	defer globalListFile.Close()
 	var pauseCount int64
 	for {
 		globalCount++
@@ -141,6 +132,7 @@ func RecordEverything() {
 			globalLogFile.WriteString(fmt.Sprintf("paused for %f\n", pauseDuration))
 			cut := fmt.Sprintf("ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=%d -t %f silence%d.mp3\n", globalFormat.SampleRate, pauseDuration, globalPauseCount)
 			globalCutFile.WriteString(cut)
+			globalListFile.WriteString(fmt.Sprintf("file 'silence%d.mp3'\n", globalPauseCount))
 			globalPauseCount++
 			globalPauseOff = false
 			globalCountLast = globalCount

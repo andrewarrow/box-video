@@ -49,6 +49,9 @@ func PlayTest() {
 		c := b[0]
 		//fmt.Printf("%d\n", c)
 		if c == 3 {
+			speaker.Lock()
+			globalTo = streamer.Position()
+			WritePlayDuration()
 			term.Restore(int(os.Stdin.Fd()), oldState)
 			break
 		} else if c == 108 { // L
@@ -58,7 +61,7 @@ func PlayTest() {
 			streamer.Seek(streamer.Position() + 100000)
 			WritePlayDuration()
 			globalFrom = streamer.Position()
-			globalFile.WriteString(fmt.Sprintf("position now %d\n", globalFrom))
+			//globalFile.WriteString(fmt.Sprintf("position now %d\n", globalFrom))
 			//PrintPosition(format, streamer.Position())
 			speaker.Unlock()
 		} else if c == 106 { // J
@@ -68,7 +71,7 @@ func PlayTest() {
 			streamer.Seek(streamer.Position() - 100000)
 			WritePlayDuration()
 			globalFrom = streamer.Position()
-			globalFile.WriteString(fmt.Sprintf("position now %d\n", globalFrom))
+			//globalFile.WriteString(fmt.Sprintf("position now %d\n", globalFrom))
 			//PrintPosition(format, streamer.Position())
 			speaker.Unlock()
 		} else if c == 107 || c == 32 { // K or space

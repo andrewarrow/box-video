@@ -3,6 +3,7 @@ package audio
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"time"
 
 	"github.com/faiface/beep"
@@ -112,9 +113,8 @@ func WritePlayDuration() {
 // ffmpeg -f concat -i list.txt -codec copy final.mp3
 
 func RecordEverything() {
-	os.Remove("data/log.txt")
-	os.Remove("data/cut.sh")
-	os.Remove("data/list.txt")
+	exec.Command("rm", "-rf", "data").CombinedOutput()
+	os.Mkdir("data", 0755)
 	globalLogFile, _ = os.OpenFile("data/log.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	globalCutFile, _ = os.OpenFile("data/cut.sh", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	globalListFile, _ = os.OpenFile("data/list.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)

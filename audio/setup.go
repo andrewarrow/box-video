@@ -16,6 +16,9 @@ var globalPauseOn bool
 var globalPauseOff bool
 var globalFrom int
 var globalTo int
+var globalFile *os.File
+var globalPlayCount int64
+var globalCount int64
 
 func PlayTest() {
 	f, err := os.Open("test.mp3")
@@ -50,14 +53,26 @@ func PlayTest() {
 			break
 		} else if c == 108 { // L
 			speaker.Lock()
+			globalTo = streamer.Position()
 			//PrintPosition(format, streamer.Position())
 			streamer.Seek(streamer.Position() + 100000)
+			playDuration := float64(globalCount-globalPlayCount) / 1000.0
+			globalFile.WriteString(fmt.Sprintf("played for %f, from %d to %d\n", playDuration, globalFrom, globalTo))
+			globalFrom = streamer.Position()
+			globalFile.WriteString(fmt.Sprintf("position now %d\n", globalFrom))
+			globalPlayCount = 0
 			//PrintPosition(format, streamer.Position())
 			speaker.Unlock()
 		} else if c == 106 { // J
 			speaker.Lock()
+			globalTo = streamer.Position()
 			//PrintPosition(format, streamer.Position())
 			streamer.Seek(streamer.Position() - 100000)
+			playDuration := float64(globalCount-globalPlayCount) / 1000.0
+			globalFile.WriteString(fmt.Sprintf("played for %f, from %d to %d\n", playDuration, globalFrom, globalTo))
+			globalFrom = streamer.Position()
+			globalFile.WriteString(fmt.Sprintf("position now %d\n", globalFrom))
+			globalPlayCount = 0
 			//PrintPosition(format, streamer.Position())
 			speaker.Unlock()
 		} else if c == 107 || c == 32 { // K or space
@@ -89,24 +104,22 @@ func PlayTest() {
 
 func RecordEverything() {
 	os.Remove("log.txt")
-	f, _ := os.OpenFile("log.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-	defer f.Close()
-	var count int64
+	globalFile, _ = os.OpenFile("log.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	defer globalFile.Close()
 	var pauseCount int64
-	var playCount int64
 	for {
-		count++
+		globalCount++
 		if globalPauseOn {
-			playDuration := float64(count-playCount) / 1000.0
-			f.WriteString(fmt.Sprintf("played for %f, from %d to %d\n", playDuration, globalFrom, globalTo))
-			pauseCount = count
+			playDuration := float64(globalCount-globalPlayCount) / 1000.0
+			globalFile.WriteString(fmt.Sprintf("played for %f, from %d to %d\n", playDuration, globalFrom, globalTo))
+			pauseCount = globalCount
 			globalPauseOn = false
 		}
 		if globalPauseOff {
-			pauseDuration := float64(count-pauseCount) / 1000.0
-			f.WriteString(fmt.Sprintf("paused for %f\n", pauseDuration))
+			pauseDuration := float64(globalCount-pauseCount) / 1000.0
+			globalFile.WriteString(fmt.Sprintf("paused for %f\n", pauseDuration))
 			globalPauseOff = false
-			playCount = 0
+			globalPlayCount = 0
 		}
 
 		time.Sleep(time.Millisecond)

@@ -107,6 +107,14 @@ func WritePlayDuration() {
 	globalCountLast = globalCount
 }
 
+// ffmpeg -i input.mp3 -ss 5.5 -to 10.1 output.mp3
+// ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=44100 -t 1.9 silence.mp3
+
+//file 'output.mp3'
+//file 'silence.mp3'
+//file 'output.mp3'
+// ffmpeg -f concat -i list.txt -codec copy final.mp3
+
 func RecordEverything() {
 	os.Remove("log.txt")
 	globalFile, _ = os.OpenFile("log.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)

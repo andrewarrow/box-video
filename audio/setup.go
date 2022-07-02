@@ -101,6 +101,8 @@ func WritePlayDuration() {
 	globalCountLast = globalCount
 }
 
+// youtube-dl --output "%(id)s.%(ext)s"
+
 // ffmpeg -i input.mp3 -ss 5.5 -to 10.1 output.mp3
 // ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=44100 -t 1.9 silence.mp3
 
@@ -110,12 +112,12 @@ func WritePlayDuration() {
 // ffmpeg -f concat -i list.txt -codec copy final.mp3
 
 func RecordEverything() {
-	os.Remove("log.txt")
-	os.Remove("cut.sh")
-	os.Remove("list.txt")
-	globalLogFile, _ = os.OpenFile("log.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-	globalCutFile, _ = os.OpenFile("cut.sh", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-	globalListFile, _ = os.OpenFile("list.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	os.Remove("data/log.txt")
+	os.Remove("data/cut.sh")
+	os.Remove("data/list.txt")
+	globalLogFile, _ = os.OpenFile("data/log.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	globalCutFile, _ = os.OpenFile("data/cut.sh", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	globalListFile, _ = os.OpenFile("data/list.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	defer globalLogFile.Close()
 	defer globalCutFile.Close()
 	defer globalListFile.Close()

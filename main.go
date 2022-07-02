@@ -10,6 +10,7 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
+	os.Mkdir("data", 0755)
 
 	if len(os.Args) == 1 {
 		PrintHelp()

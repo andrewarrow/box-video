@@ -39,19 +39,31 @@ func PlayTest() {
 		b := make([]byte, 1)
 		os.Stdin.Read(b)
 		c := b[0]
-		fmt.Printf("%d\n", c)
+		//fmt.Printf("%d\n", c)
 		if c == 3 {
 			term.Restore(int(os.Stdin.Fd()), oldState)
 			break
+		} else if c == 108 { // L
+			speaker.Lock()
+			fmt.Println(format.SampleRate.D(streamer.Position()))
+			streamer.Seek(streamer.Position() + 100000)
+			fmt.Println(format.SampleRate.D(streamer.Position()))
+			speaker.Unlock()
+		} else if c == 106 { // J
+			speaker.Lock()
+			fmt.Println(format.SampleRate.D(streamer.Position()))
+			streamer.Seek(streamer.Position() - 100000)
+			fmt.Println(format.SampleRate.D(streamer.Position()))
+			speaker.Unlock()
+		} else if c == 107 || c == 32 { // K or space
+			speaker.Lock()
+			ctrl.Paused = !ctrl.Paused
+			speaker.Unlock()
 		}
 	}
 
 	/*
 		for {
-			fmt.Print("Press [ENTER] to pause/resume. ")
-			var cmd string
-			fmt.Scan(&cmd)
-			fmt.Println(cmd)
 
 			speaker.Lock()
 			fmt.Println(streamer.Position())

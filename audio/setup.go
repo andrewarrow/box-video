@@ -12,15 +12,13 @@ import (
 	"golang.org/x/term"
 )
 
-var globalOn bool
-var globalFormat beep.Format
-var globalStreamer beep.StreamSeekCloser
+var globalPauseOn bool
+var globalPauseOff bool
 
 func PlayTest() {
 	f, err := os.Open("test.mp3")
 	fmt.Println(err)
-	globalStreamer, globalFormat, _ = mp3.Decode(f)
-	fmt.Println(err)
+	streamer, format, _ := mp3.Decode(f)
 	defer streamer.Close()
 
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
@@ -50,20 +48,25 @@ func PlayTest() {
 			break
 		} else if c == 108 { // L
 			speaker.Lock()
-			PrintPosition(format, streamer.Position())
+			//PrintPosition(format, streamer.Position())
 			streamer.Seek(streamer.Position() + 100000)
-			PrintPosition(format, streamer.Position())
+			//PrintPosition(format, streamer.Position())
 			speaker.Unlock()
 		} else if c == 106 { // J
 			speaker.Lock()
-			PrintPosition(format, streamer.Position())
+			//PrintPosition(format, streamer.Position())
 			streamer.Seek(streamer.Position() - 100000)
-			PrintPosition(format, streamer.Position())
+			//PrintPosition(format, streamer.Position())
 			speaker.Unlock()
 		} else if c == 107 || c == 32 { // K or space
 			speaker.Lock()
-			globalOn = true
-			ctrl.Paused = !ctrl.Paused
+			if ctrl.Paused == false {
+				globalPauseOn = true
+				ctrl.Paused = true
+			} else {
+				globalPauseOff = true
+				ctrl.Paused = false
+			}
 			speaker.Unlock()
 		}
 	}
@@ -71,7 +74,7 @@ func PlayTest() {
 }
 
 // played for 4.3 seconds, from 0 to 11101010 pos
-// paused for 8.2 second, from 11101010 to 21101010 pos
+// paused for 8.2 second
 // played for 16.17 seconds, from 21101010 to 31101010 pos
 // advanced to pos 41101010
 // played for 0.01 seconds, from 41101010 to 41101011 pos
@@ -81,12 +84,21 @@ func PlayTest() {
 // paused for 9 seconds
 
 func RecordEverything() {
+	os.Remove("log.txt")
+	f, _ := os.OpenFile("log.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	defer f.Close()
 	var count int64
+	var pauseCount int64
 	for {
 		count++
-		if globalOn {
-			fmt.Println("secs", float64(count)/1000.0)
-			globalOn = false
+		if globalPauseOn {
+			pauseCount = count
+			globalPauseOn = false
+		}
+		if globalPauseOff {
+			pauseDuration := float64(count-pauseCount) / 1000.0
+			f.WriteString(fmt.Sprintf("paused for %f\n", pauseDuration))
+			globalPauseOff = false
 		}
 		time.Sleep(time.Millisecond)
 	}

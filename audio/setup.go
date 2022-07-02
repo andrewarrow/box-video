@@ -22,6 +22,7 @@ var globalCountLast int64
 var globalFormat beep.Format
 var globalPlayCount int
 var globalPauseCount int
+var globalMaxLength int
 
 var globalLogFile *os.File
 var globalCutFile *os.File
@@ -32,7 +33,8 @@ func PlayTest() {
 	fmt.Println(err)
 	var streamer beep.StreamSeekCloser
 	streamer, globalFormat, _ = mp3.Decode(f)
-	fmt.Println(globalFormat.SampleRate)
+	globalMaxLength = streamer.Len()
+	fmt.Println(globalMaxLength, globalFormat.SampleRate)
 	defer streamer.Close()
 
 	speaker.Init(globalFormat.SampleRate, globalFormat.SampleRate.N(time.Second/10))
@@ -67,6 +69,8 @@ func PlayTest() {
 			speaker.Lock()
 			streamer.Seek(streamer.Position() + 100000)
 			globalFrom = streamer.Position()
+			percentDone := float64(globalFrom) / float64(globalMaxLength)
+			fmt.Printf("%0.2f\n", percentDone*100)
 			speaker.Unlock()
 		} else if c == 106 { // J
 			speaker.Lock()

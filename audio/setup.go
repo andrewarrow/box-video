@@ -9,6 +9,7 @@ import (
 	"github.com/faiface/beep/effects"
 	"github.com/faiface/beep/mp3"
 	"github.com/faiface/beep/speaker"
+	"golang.org/x/term"
 )
 
 func PlayTest() {
@@ -32,16 +33,42 @@ func PlayTest() {
 
 	speaker.Play(speedy)
 
-	for {
-		fmt.Print("Press [ENTER] to pause/resume. ")
-		fmt.Scanln()
+	oldState, _ := term.MakeRaw(int(os.Stdin.Fd()))
 
-		speaker.Lock()
-		ctrl.Paused = !ctrl.Paused
-		speedy.SetRatio(speedy.Ratio() + 0.1)
-		speaker.Unlock()
+	for {
+		b := make([]byte, 1)
+		os.Stdin.Read(b)
+		c := b[0]
+		fmt.Printf("%d\n", c)
+		if c == 3 {
+			term.Restore(int(os.Stdin.Fd()), oldState)
+			break
+		}
 	}
 
+	/*
+		for {
+			fmt.Print("Press [ENTER] to pause/resume. ")
+			var cmd string
+			fmt.Scan(&cmd)
+			fmt.Println(cmd)
+
+			speaker.Lock()
+			fmt.Println(streamer.Position())
+			fmt.Println(format.SampleRate.D(streamer.Position()))
+			//fmt.Println(format.SampleRate.D(streamer.Position()).Round(time.Second))
+			if ctrl.Paused == false {
+				ctrl.Paused = true
+				fmt.Println("+")
+				speedy.SetRatio(speedy.Ratio() + 0.5)
+			} else {
+				ctrl.Paused = false
+				fmt.Println("-")
+				speedy.SetRatio(speedy.Ratio() - 0.5)
+			}
+			speaker.Unlock()
+		}
+	*/
 }
 
 func ListenForKeys() {

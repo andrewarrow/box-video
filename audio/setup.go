@@ -20,6 +20,7 @@ var globalCount int64
 var globalCountLast int64
 var globalFormat beep.Format
 var globalPlayCount int
+var globalPauseCount int
 
 var globalLogFile *os.File
 var globalCutFile *os.File
@@ -29,6 +30,7 @@ func PlayTest() {
 	fmt.Println(err)
 	var streamer beep.StreamSeekCloser
 	streamer, globalFormat, _ = mp3.Decode(f)
+	fmt.Println(globalFormat.SampleRate)
 	defer streamer.Close()
 
 	speaker.Init(globalFormat.SampleRate, globalFormat.SampleRate.N(time.Second/10))
@@ -137,6 +139,9 @@ func RecordEverything() {
 		if globalPauseOff {
 			pauseDuration := float64(globalCount-pauseCount) / 1000.0
 			globalLogFile.WriteString(fmt.Sprintf("paused for %f\n", pauseDuration))
+			cut := fmt.Sprintf("ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=%d -t %f silence%d.mp3\n", globalFormat.SampleRate, pauseDuration, globalPauseCount)
+			globalCutFile.WriteString(cut)
+			globalPauseCount++
 			globalPauseOff = false
 			globalCountLast = globalCount
 		}

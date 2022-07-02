@@ -19,6 +19,7 @@ var globalTo int
 var globalFile *os.File
 var globalPlayCount int64
 var globalCount int64
+var globalCountLast int64
 
 func PlayTest() {
 	f, err := os.Open("test.mp3")
@@ -56,10 +57,11 @@ func PlayTest() {
 			globalTo = streamer.Position()
 			//PrintPosition(format, streamer.Position())
 			streamer.Seek(streamer.Position() + 100000)
-			playDuration := float64(globalCount-globalPlayCount) / 1000.0
+			playDuration := float64(globalCount-globalCountLast) / 1000.0
 			globalFile.WriteString(fmt.Sprintf("played for %f, from %d to %d\n", playDuration, globalFrom, globalTo))
 			globalFrom = streamer.Position()
 			globalFile.WriteString(fmt.Sprintf("position now %d\n", globalFrom))
+			globalCountLast = globalCount
 			globalPlayCount = 0
 			//PrintPosition(format, streamer.Position())
 			speaker.Unlock()
@@ -68,10 +70,11 @@ func PlayTest() {
 			globalTo = streamer.Position()
 			//PrintPosition(format, streamer.Position())
 			streamer.Seek(streamer.Position() - 100000)
-			playDuration := float64(globalCount-globalPlayCount) / 1000.0
+			playDuration := float64(globalCount-globalCountLast) / 1000.0
 			globalFile.WriteString(fmt.Sprintf("played for %f, from %d to %d\n", playDuration, globalFrom, globalTo))
 			globalFrom = streamer.Position()
 			globalFile.WriteString(fmt.Sprintf("position now %d\n", globalFrom))
+			globalCountLast = globalCount
 			globalPlayCount = 0
 			//PrintPosition(format, streamer.Position())
 			speaker.Unlock()

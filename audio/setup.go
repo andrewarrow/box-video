@@ -12,10 +12,14 @@ import (
 	"golang.org/x/term"
 )
 
+var globalOn bool
+var globalFormat beep.Format
+var globalStreamer beep.StreamSeekCloser
+
 func PlayTest() {
 	f, err := os.Open("test.mp3")
 	fmt.Println(err)
-	streamer, format, err := mp3.Decode(f)
+	globalStreamer, globalFormat, _ = mp3.Decode(f)
 	fmt.Println(err)
 	defer streamer.Close()
 
@@ -31,6 +35,7 @@ func PlayTest() {
 	}
 	speedy := beep.ResampleRatio(4, 1, volume)
 
+	go RecordEverything()
 	speaker.Play(speedy)
 
 	oldState, _ := term.MakeRaw(int(os.Stdin.Fd()))
@@ -57,11 +62,34 @@ func PlayTest() {
 			speaker.Unlock()
 		} else if c == 107 || c == 32 { // K or space
 			speaker.Lock()
+			globalOn = true
 			ctrl.Paused = !ctrl.Paused
 			speaker.Unlock()
 		}
 	}
 
+}
+
+// played for 4.3 seconds, from 0 to 11101010 pos
+// paused for 8.2 second, from 11101010 to 21101010 pos
+// played for 16.17 seconds, from 21101010 to 31101010 pos
+// advanced to pos 41101010
+// played for 0.01 seconds, from 41101010 to 41101011 pos
+// advanced to pos 51101010
+// played for 0.02 seconds, from 51101010 to 51101012 pos
+// played for 13.6 seconds, from 51101012 to 61101012 pos
+// paused for 9 seconds
+
+func RecordEverything() {
+	var count int64
+	for {
+		count++
+		if globalOn {
+			fmt.Println("secs", float64(count)/1000.0)
+			globalOn = false
+		}
+		time.Sleep(time.Millisecond)
+	}
 }
 
 func PrintPosition(format beep.Format, pos int) {

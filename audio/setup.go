@@ -16,10 +16,13 @@ var globalPauseOn bool
 var globalPauseOff bool
 var globalFrom int
 var globalTo int
-var globalFile *os.File
 var globalCount int64
 var globalCountLast int64
 var globalFormat beep.Format
+var globalPlayCount int
+
+var globalLogFile *os.File
+var globalCutFile *os.File
 
 func PlayTest() {
 	f, err := os.Open("test.mp3")
@@ -58,16 +61,16 @@ func PlayTest() {
 			break
 		} else if c == 108 { // L
 			speaker.Lock()
-			globalTo = streamer.Position()
+			//globalTo = streamer.Position()
 			streamer.Seek(streamer.Position() + 100000)
-			WritePlayDuration()
+			//WritePlayDuration()
 			globalFrom = streamer.Position()
 			speaker.Unlock()
 		} else if c == 106 { // J
 			speaker.Lock()
-			globalTo = streamer.Position()
+			//globalTo = streamer.Position()
 			streamer.Seek(streamer.Position() - 100000)
-			WritePlayDuration()
+			//WritePlayDuration()
 			globalFrom = streamer.Position()
 			speaker.Unlock()
 		} else if c == 107 || c == 32 { // K or space
@@ -99,11 +102,12 @@ func PlayTest() {
 
 func WritePlayDuration() {
 	playDuration := float64(globalCount-globalCountLast) / 1000.0
-	if playDuration >= 1.0 {
-		globalFile.WriteString(fmt.Sprintf("played for %f, from %s to %s\n", playDuration,
-			PositionAsSeconds(globalFrom),
-			PositionAsSeconds(globalTo)))
-	}
+	fs := PositionAsSeconds(globalFrom)
+	ts := PositionAsSeconds(globalTo)
+	globalLogFile.WriteString(fmt.Sprintf("played for %f, from %s to %s\n", playDuration, fs, ts))
+	cut := fmt.Sprintf("ffmpeg -i test.mp3 -ss %s -to %s play%d.mp3\n", fs, ts, globalPlayCount)
+	globalCutFile.WriteString(cut)
+	globalPlayCount++
 	globalCountLast = globalCount
 }
 
@@ -117,8 +121,11 @@ func WritePlayDuration() {
 
 func RecordEverything() {
 	os.Remove("log.txt")
-	globalFile, _ = os.OpenFile("log.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-	defer globalFile.Close()
+	os.Remove("cut.sh")
+	globalLogFile, _ = os.OpenFile("log.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	globalCutFile, _ = os.OpenFile("cut.sh", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	defer globalLogFile.Close()
+	defer globalCutFile.Close()
 	var pauseCount int64
 	for {
 		globalCount++
@@ -129,7 +136,7 @@ func RecordEverything() {
 		}
 		if globalPauseOff {
 			pauseDuration := float64(globalCount-pauseCount) / 1000.0
-			globalFile.WriteString(fmt.Sprintf("paused for %f\n", pauseDuration))
+			globalLogFile.WriteString(fmt.Sprintf("paused for %f\n", pauseDuration))
 			globalPauseOff = false
 			globalCountLast = globalCount
 		}
@@ -139,7 +146,6 @@ func RecordEverything() {
 }
 
 func PositionAsSeconds(pos int) string {
-	fmt.Println("*********", pos, globalFormat.SampleRate)
 	p := globalFormat.SampleRate.D(pos)
 	f := float64(int64(p)) / 1000000000.0
 	return fmt.Sprintf("%f", f)

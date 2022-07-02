@@ -45,15 +45,20 @@ func PlayTest() {
 			break
 		} else if c == 108 { // L
 			speaker.Lock()
-			fmt.Println(format.SampleRate.D(streamer.Position()))
+			p := format.SampleRate.D(streamer.Position())
+			f := float64(int64(p)) / 1000000000.0
+			fmt.Println(f)
 			streamer.Seek(streamer.Position() + 100000)
-			fmt.Println(format.SampleRate.D(streamer.Position()))
+			p = format.SampleRate.D(streamer.Position())
+			fmt.Println(int64(p))
 			speaker.Unlock()
 		} else if c == 106 { // J
 			speaker.Lock()
-			fmt.Println(format.SampleRate.D(streamer.Position()))
+			p := format.SampleRate.D(streamer.Position())
+			fmt.Println(int64(p))
 			streamer.Seek(streamer.Position() - 100000)
-			fmt.Println(format.SampleRate.D(streamer.Position()))
+			p = format.SampleRate.D(streamer.Position())
+			fmt.Println(int64(p))
 			speaker.Unlock()
 		} else if c == 107 || c == 32 { // K or space
 			speaker.Lock()

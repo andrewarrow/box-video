@@ -1,6 +1,7 @@
 package main
 
 import (
+	"box-video/audio"
 	"fmt"
 	"math/rand"
 	"os"
@@ -19,6 +20,7 @@ func main() {
 	if command == "source" {
 		file := os.Args[2]
 		fmt.Println(file)
-	} else if command == "parse" {
+	} else if command == "audio" {
+		audio.PlayTest()
 	}
 }

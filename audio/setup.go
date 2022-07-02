@@ -29,6 +29,13 @@ var globalCutFile *os.File
 var globalListFile *os.File
 
 func PlayTest() {
+	fmt.Println("1")
+	time.Sleep(time.Second * 1)
+	fmt.Println("2")
+	time.Sleep(time.Second * 1)
+	fmt.Println("3")
+	time.Sleep(time.Second * 1)
+	fmt.Println("GO")
 	f, err := os.Open("test.mp3")
 	fmt.Println(err)
 	var streamer beep.StreamSeekCloser
@@ -99,7 +106,7 @@ func WritePlayDuration() {
 	fs := PositionAsSeconds(globalFrom)
 	ts := PositionAsSeconds(globalTo)
 	globalLogFile.WriteString(fmt.Sprintf("played for %f, from %s to %s\n", playDuration, fs, ts))
-	cut := fmt.Sprintf("ffmpeg -i test.mp3 -ss %s -to %s play%d.mp3\n", fs, ts, globalPlayCount)
+	cut := fmt.Sprintf("ffmpeg -i ../test.mp3 -ss %s -to %s play%d.mp3\n", fs, ts, globalPlayCount)
 	globalCutFile.WriteString(cut)
 	globalListFile.WriteString(fmt.Sprintf("file 'play%d.mp3'\n", globalPlayCount))
 	globalPlayCount++
@@ -115,6 +122,8 @@ func WritePlayDuration() {
 //file 'silence.mp3'
 //file 'output.mp3'
 // ffmpeg -f concat -i list.txt -codec copy final.mp3
+
+// ffmpeg -y -i audio1.mp3 -i audio2.mp3 -filter_complex "[0:0]volume=0.09[a];[1:0]volume=1.8[b];[a][b]amix=inputs=2:duration=longest" -c:a libmp3lame output.mp3
 
 func RecordEverything() {
 	exec.Command("rm", "-rf", "data").CombinedOutput()
@@ -136,7 +145,7 @@ func RecordEverything() {
 		if globalPauseOff {
 			pauseDuration := float64(globalCount-pauseCount) / 1000.0
 			globalLogFile.WriteString(fmt.Sprintf("paused for %f\n", pauseDuration))
-			cut := fmt.Sprintf("ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=%d -t %f silence%d.mp3\n", globalFormat.SampleRate, pauseDuration, globalPauseCount)
+			cut := fmt.Sprintf("ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=%d -t %f silence%d.mp3\n", globalFormat.SampleRate, pauseDuration+0.125, globalPauseCount)
 			globalCutFile.WriteString(cut)
 			globalListFile.WriteString(fmt.Sprintf("file 'silence%d.mp3'\n", globalPauseCount))
 			globalPauseCount++

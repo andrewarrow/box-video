@@ -45,20 +45,15 @@ func PlayTest() {
 			break
 		} else if c == 108 { // L
 			speaker.Lock()
-			p := format.SampleRate.D(streamer.Position())
-			f := float64(int64(p)) / 1000000000.0
-			fmt.Println(f)
+			PrintPosition(format, streamer.Position())
 			streamer.Seek(streamer.Position() + 100000)
-			p = format.SampleRate.D(streamer.Position())
-			fmt.Println(int64(p))
+			PrintPosition(format, streamer.Position())
 			speaker.Unlock()
 		} else if c == 106 { // J
 			speaker.Lock()
-			p := format.SampleRate.D(streamer.Position())
-			fmt.Println(int64(p))
+			PrintPosition(format, streamer.Position())
 			streamer.Seek(streamer.Position() - 100000)
-			p = format.SampleRate.D(streamer.Position())
-			fmt.Println(int64(p))
+			PrintPosition(format, streamer.Position())
 			speaker.Unlock()
 		} else if c == 107 || c == 32 { // K or space
 			speaker.Lock()
@@ -67,27 +62,10 @@ func PlayTest() {
 		}
 	}
 
-	/*
-		for {
-
-			speaker.Lock()
-			fmt.Println(streamer.Position())
-			fmt.Println(format.SampleRate.D(streamer.Position()))
-			//fmt.Println(format.SampleRate.D(streamer.Position()).Round(time.Second))
-			if ctrl.Paused == false {
-				ctrl.Paused = true
-				fmt.Println("+")
-				speedy.SetRatio(speedy.Ratio() + 0.5)
-			} else {
-				ctrl.Paused = false
-				fmt.Println("-")
-				speedy.SetRatio(speedy.Ratio() - 0.5)
-			}
-			speaker.Unlock()
-		}
-	*/
 }
 
-func ListenForKeys() {
-
+func PrintPosition(format beep.Format, pos int) {
+	p := format.SampleRate.D(pos)
+	f := float64(int64(p)) / 1000000000.0
+	fmt.Println(f)
 }

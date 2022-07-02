@@ -19,14 +19,16 @@ var globalTo int
 var globalFile *os.File
 var globalCount int64
 var globalCountLast int64
+var globalFormat beep.Format
 
 func PlayTest() {
 	f, err := os.Open("test.mp3")
 	fmt.Println(err)
-	streamer, format, _ := mp3.Decode(f)
+	var streamer beep.StreamSeekCloser
+	streamer, globalFormat, _ = mp3.Decode(f)
 	defer streamer.Close()
 
-	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+	speaker.Init(globalFormat.SampleRate, globalFormat.SampleRate.N(time.Second/10))
 
 	ctrl := &beep.Ctrl{Streamer: beep.Loop(-1, streamer), Paused: false}
 
@@ -57,22 +59,16 @@ func PlayTest() {
 		} else if c == 108 { // L
 			speaker.Lock()
 			globalTo = streamer.Position()
-			//PrintPosition(format, streamer.Position())
 			streamer.Seek(streamer.Position() + 100000)
 			WritePlayDuration()
 			globalFrom = streamer.Position()
-			//globalFile.WriteString(fmt.Sprintf("position now %d\n", globalFrom))
-			//PrintPosition(format, streamer.Position())
 			speaker.Unlock()
 		} else if c == 106 { // J
 			speaker.Lock()
 			globalTo = streamer.Position()
-			//PrintPosition(format, streamer.Position())
 			streamer.Seek(streamer.Position() - 100000)
 			WritePlayDuration()
 			globalFrom = streamer.Position()
-			//globalFile.WriteString(fmt.Sprintf("position now %d\n", globalFrom))
-			//PrintPosition(format, streamer.Position())
 			speaker.Unlock()
 		} else if c == 107 || c == 32 { // K or space
 			speaker.Lock()
@@ -103,7 +99,11 @@ func PlayTest() {
 
 func WritePlayDuration() {
 	playDuration := float64(globalCount-globalCountLast) / 1000.0
-	globalFile.WriteString(fmt.Sprintf("played for %f, from %d to %d\n", playDuration, globalFrom, globalTo))
+	if playDuration >= 1.0 {
+		globalFile.WriteString(fmt.Sprintf("played for %f, from %s to %s\n", playDuration,
+			PositionAsSeconds(globalFrom),
+			PositionAsSeconds(globalTo)))
+	}
 	globalCountLast = globalCount
 }
 
@@ -138,8 +138,9 @@ func RecordEverything() {
 	}
 }
 
-func PrintPosition(format beep.Format, pos int) {
-	p := format.SampleRate.D(pos)
+func PositionAsSeconds(pos int) string {
+	fmt.Println("*********", pos, globalFormat.SampleRate)
+	p := globalFormat.SampleRate.D(pos)
 	f := float64(int64(p)) / 1000000000.0
-	fmt.Println(f)
+	return fmt.Sprintf("%f", f)
 }

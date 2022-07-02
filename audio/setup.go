@@ -14,6 +14,8 @@ import (
 
 var globalPauseOn bool
 var globalPauseOff bool
+var globalFrom int
+var globalTo int
 
 func PlayTest() {
 	f, err := os.Open("test.mp3")
@@ -61,9 +63,11 @@ func PlayTest() {
 		} else if c == 107 || c == 32 { // K or space
 			speaker.Lock()
 			if ctrl.Paused == false {
+				globalTo = streamer.Position()
 				globalPauseOn = true
 				ctrl.Paused = true
 			} else {
+				globalFrom = streamer.Position()
 				globalPauseOff = true
 				ctrl.Paused = false
 			}
@@ -89,9 +93,12 @@ func RecordEverything() {
 	defer f.Close()
 	var count int64
 	var pauseCount int64
+	var playCount int64
 	for {
 		count++
 		if globalPauseOn {
+			playDuration := float64(count-playCount) / 1000.0
+			f.WriteString(fmt.Sprintf("played for %f, from %d to %d\n", playDuration, globalFrom, globalTo))
 			pauseCount = count
 			globalPauseOn = false
 		}
@@ -99,7 +106,9 @@ func RecordEverything() {
 			pauseDuration := float64(count-pauseCount) / 1000.0
 			f.WriteString(fmt.Sprintf("paused for %f\n", pauseDuration))
 			globalPauseOff = false
+			playCount = 0
 		}
+
 		time.Sleep(time.Millisecond)
 	}
 }

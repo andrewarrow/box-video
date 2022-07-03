@@ -125,6 +125,10 @@ func WritePlayDuration() {
 
 // ffmpeg -y -i audio1.mp3 -i audio2.mp3 -filter_complex "[0:0]volume=0.09[a];[1:0]volume=1.8[b];[a][b]amix=inputs=2:duration=longest" -c:a libmp3lame output.mp3
 
+//  ffmpeg -i andrew.mp3 -af "volumedetect" -vn -sn -dn -f null /dev/null
+// ffmpeg -i ../final.mp3 -filter:a "volume=4.0" final.mp3
+// https://superuser.com/questions/323119/how-can-i-normalize-audio-using-ffmpeg
+
 func RecordEverything() {
 	exec.Command("rm", "-rf", "data").CombinedOutput()
 	os.Mkdir("data", 0755)

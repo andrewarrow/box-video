@@ -29,13 +29,6 @@ var globalCutFile *os.File
 var globalListFile *os.File
 
 func PlayTest() {
-	fmt.Println("1")
-	time.Sleep(time.Second * 1)
-	fmt.Println("2")
-	time.Sleep(time.Second * 1)
-	fmt.Println("3")
-	time.Sleep(time.Second * 1)
-	fmt.Println("GO")
 	f, err := os.Open("test.mp3")
 	fmt.Println(err)
 	var streamer beep.StreamSeekCloser

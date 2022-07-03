@@ -22,5 +22,8 @@ func main() {
 		fmt.Println(file)
 	} else if command == "audio" {
 		audio.PlayTest()
+	} else if command == "mark" {
+		file := os.Args[2]
+		audio.PlayForMark(file)
 	}
 }

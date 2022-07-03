@@ -25,5 +25,7 @@ func main() {
 	} else if command == "mark" {
 		file := os.Args[2]
 		audio.PlayForMark(file)
+	} else if command == "merge" {
+		audio.Merge()
 	}
 }

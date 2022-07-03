@@ -142,7 +142,7 @@ func RecordEverything() {
 		if globalPauseOff {
 			pauseDuration := float64(globalCount-pauseCount) / 1000.0
 			globalLogFile.WriteString(fmt.Sprintf("paused for %f\n", pauseDuration))
-			cut := fmt.Sprintf("ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=%d -t %f silence%d.mp3\n", globalFormat.SampleRate, pauseDuration+0.125, globalPauseCount)
+			cut := fmt.Sprintf("ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=%d -t %f silence%d.mp3\n", globalFormat.SampleRate, pauseDuration, globalPauseCount)
 			globalCutFile.WriteString(cut)
 			globalListFile.WriteString(fmt.Sprintf("file 'silence%d.mp3'\n", globalPauseCount))
 			globalPauseCount++

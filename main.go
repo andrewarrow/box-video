@@ -2,7 +2,9 @@ package main
 
 import (
 	"box-video/audio"
+	"box-video/video"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"time"
@@ -27,5 +29,17 @@ func main() {
 		audio.PlayForMark(file)
 	} else if command == "merge" {
 		audio.Merge()
+	} else if command == "clip" {
+		file := os.Args[2]
+		audio.PlayForClip(file)
+	} else if command == "title" {
+		title := os.Args[2]
+		dir := "/Users/aa/watts/joy/keep"
+		files, _ := ioutil.ReadDir(dir)
+		for i, file := range files {
+			name := file.Name()
+			path := dir + "/" + name
+			video.MakeTitle(title, path, i*30)
+		}
 	}
 }

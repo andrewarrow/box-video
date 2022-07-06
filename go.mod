@@ -4,10 +4,12 @@ go 1.18
 
 require (
 	github.com/faiface/beep v1.1.0
+	github.com/fogleman/gg v1.3.0
 	golang.org/x/term v0.0.0-20220526004731-065cf7ba2467
 )
 
 require (
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/hajimehoshi/go-mp3 v0.3.0 // indirect
 	github.com/hajimehoshi/oto v0.7.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

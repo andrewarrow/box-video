@@ -49,7 +49,7 @@ func MakeStars() {
 			dc.Fill()
 		}
 		fmt.Println(count, i)
-		makeLineGoingUp(dc, i)
+		makeLineGoingUpAndDown(dc, i)
 
 		if true {
 			break
@@ -58,18 +58,46 @@ func MakeStars() {
 	ffmpeg()
 }
 
-func makeLineGoingUp(dc *gg.Context, i int) {
+func makeLineGoingUpAndDown(dc *gg.Context, i int) {
 	j := 1069
+	count := 0
+	var c *gg.Context
 	for {
 		color := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
 		pattern := gg.NewSolidPattern(color)
-		c := gg.NewContextForImage(dc.Image())
+		c = gg.NewContextForImage(dc.Image())
 		c.SetFillStyle(pattern)
 		c.DrawRectangle(0, float64(j), 1920, 10)
 		c.Fill()
-		c.SavePNG(fmt.Sprintf("data/img%07d.png", j))
-		j--
+		fmt.Println(count)
+		c.SavePNG(fmt.Sprintf("data/img%07d.png", count))
+		j -= 8
+		count++
 		if j < 0 {
+			break
+		}
+	}
+	pause := 0
+	for {
+		c.SavePNG(fmt.Sprintf("data/img%07d.png", count))
+		pause++
+		count++
+		if pause > 60 {
+			break
+		}
+	}
+	for {
+		color := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
+		pattern := gg.NewSolidPattern(color)
+		c = gg.NewContextForImage(dc.Image())
+		c.SetFillStyle(pattern)
+		c.DrawRectangle(0, float64(j), 1920, 10)
+		c.Fill()
+		fmt.Println(count)
+		c.SavePNG(fmt.Sprintf("data/img%07d.png", count))
+		j += 8
+		count++
+		if j > 1069 {
 			break
 		}
 	}

@@ -19,6 +19,17 @@ type Star struct {
 var list = []*Star{}
 var frameCount = 0
 
+func CountActive() int {
+	count := 0
+	for _, star := range list {
+		if !star.On {
+			continue
+		}
+		count++
+	}
+	return count
+}
+
 func MakeStars() {
 	exec.Command("rm", "-rf", "data").CombinedOutput()
 	os.Mkdir("data", 0755)
@@ -57,6 +68,9 @@ func MakeStars() {
 		makeLineGoingUp(dc, i)
 
 		for _, star := range list {
+			if !star.On {
+				continue
+			}
 			chance := rand.Intn(100)
 			if chance <= 2 {
 				star.On = false
@@ -82,17 +96,24 @@ func MakeStars() {
 		makeLineGoingDown(dc, i)
 
 		for _, star := range list {
+			if !star.On {
+				continue
+			}
 			chance := rand.Intn(100)
 			if chance <= 2 {
 				star.On = false
 			}
 		}
 
-		if i > 5 {
+		i++
+		if CountActive() == 0 {
 			break
 		}
-		i++
 	}
+	dc := gg.NewContext(1920, 1080)
+	dc.SetRGB(0, 0, 0)
+	dc.Clear()
+	makeLineGoingDown(dc, i)
 	ffmpeg()
 }
 
@@ -108,7 +129,7 @@ func makeLineGoingUp(dc *gg.Context, i int) {
 		c.Fill()
 		fmt.Println(frameCount)
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
-		j -= 8
+		j -= 4
 		frameCount++
 		if j < 0 {
 			break
@@ -128,7 +149,7 @@ func makeLineGoingDown(dc *gg.Context, i int) {
 		c.Fill()
 		fmt.Println(frameCount)
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
-		j += 8
+		j += 4
 		frameCount++
 		if j > 1069 {
 			break

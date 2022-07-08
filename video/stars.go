@@ -113,6 +113,7 @@ func MakeStars() {
 	dc := gg.NewContext(1920, 1080)
 	dc.SetRGB(0, 0, 0)
 	dc.Clear()
+	makeLineGoingUp(dc, i)
 	makeLineGoingDown(dc, i)
 	ffmpeg()
 }

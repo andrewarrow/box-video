@@ -16,6 +16,7 @@ type Star struct {
 }
 
 var list = []*Star{}
+var frameCount = 0
 
 func MakeStars() {
 	i := 0
@@ -51,16 +52,23 @@ func MakeStars() {
 		fmt.Println(count, i)
 		makeLineGoingUpAndDown(dc, i)
 
-		if true {
+		for _, star := range list {
+			chance := rand.Intn(100)
+			if chance <= 2 {
+				star.On = false
+			}
+		}
+
+		if i > 130 {
 			break
 		}
+		i++
 	}
 	ffmpeg()
 }
 
 func makeLineGoingUpAndDown(dc *gg.Context, i int) {
 	j := 1069
-	count := 0
 	var c *gg.Context
 	for {
 		color := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
@@ -69,23 +77,24 @@ func makeLineGoingUpAndDown(dc *gg.Context, i int) {
 		c.SetFillStyle(pattern)
 		c.DrawRectangle(0, float64(j), 1920, 10)
 		c.Fill()
-		fmt.Println(count)
-		c.SavePNG(fmt.Sprintf("data/img%07d.png", count))
+		fmt.Println(frameCount)
+		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		j -= 8
-		count++
+		frameCount++
 		if j < 0 {
 			break
 		}
 	}
 	pause := 0
 	for {
-		c.SavePNG(fmt.Sprintf("data/img%07d.png", count))
+		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		pause++
-		count++
+		frameCount++
 		if pause > 60 {
 			break
 		}
 	}
+	j = 0
 	for {
 		color := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
 		pattern := gg.NewSolidPattern(color)
@@ -93,10 +102,10 @@ func makeLineGoingUpAndDown(dc *gg.Context, i int) {
 		c.SetFillStyle(pattern)
 		c.DrawRectangle(0, float64(j), 1920, 10)
 		c.Fill()
-		fmt.Println(count)
-		c.SavePNG(fmt.Sprintf("data/img%07d.png", count))
+		fmt.Println(frameCount)
+		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		j += 8
-		count++
+		frameCount++
 		if j > 1069 {
 			break
 		}

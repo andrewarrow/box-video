@@ -7,11 +7,14 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os"
+	"os/exec"
 	"time"
 )
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
+	exec.Command("rm", "-rf", "data").CombinedOutput()
+	os.Mkdir("data", 0755)
 
 	if len(os.Args) == 1 {
 		PrintHelp()

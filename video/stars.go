@@ -72,7 +72,7 @@ func MakeStars() {
 				continue
 			}
 			chance := rand.Intn(100)
-			if chance <= 2 {
+			if chance <= i {
 				star.On = false
 			}
 		}
@@ -100,7 +100,7 @@ func MakeStars() {
 				continue
 			}
 			chance := rand.Intn(100)
-			if chance <= 2 {
+			if chance <= i {
 				star.On = false
 			}
 		}
@@ -128,7 +128,7 @@ func makeLineGoingUp(dc *gg.Context, i int) {
 		c.SetFillStyle(pattern)
 		c.DrawRectangle(0, float64(j), 1920, 10)
 		c.Fill()
-		fmt.Println(frameCount)
+		//fmt.Println(frameCount)
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		j -= 4
 		frameCount++
@@ -148,7 +148,7 @@ func makeLineGoingDown(dc *gg.Context, i int) {
 		c.SetFillStyle(pattern)
 		c.DrawRectangle(0, float64(j), 1920, 10)
 		c.Fill()
-		fmt.Println(frameCount)
+		//fmt.Println(frameCount)
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		j += 4
 		frameCount++

@@ -2,11 +2,41 @@ package video
 
 import (
 	"fmt"
+	"image"
+	"image/color"
+	"image/png"
+	"os"
 
 	"github.com/fogleman/gg"
 )
 
 func MakeWords() {
+	RmRfBang()
+	dc := gg.NewContext(1920, 1080)
+	dc.SetRGB(0, 200, 200)
+	dc.Clear()
+
+	file, _ := os.Open("perfect/img0000001.png")
+	im, _ := png.Decode(file)
+
+	rgba := im.(*image.RGBA)
+
+	x := 660
+	y := 191
+	w := 609 - 16
+	h := 346 - 8
+	cropped := rgba.SubImage(image.Rect(x, y, w+x, h+y))
+
+	color := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
+	pattern := gg.NewSolidPattern(color)
+	dc.SetFillStyle(pattern)
+	dc.DrawRectangle(650, 180, float64(w+20), float64(h+20))
+	dc.Fill()
+	dc.DrawImage(cropped, 0, 0)
+	dc.SavePNG(fmt.Sprintf("data/img%07d.png", 1))
+}
+
+func MakeWords2() {
 	RmRfBang()
 
 	words := []string{"Words", "are", "in", "a", "nice", "font."}
@@ -14,13 +44,6 @@ func MakeWords() {
 	dc.SetRGB(0, 200, 200)
 	dc.Clear()
 	dc.LoadFontFace("arialbd.ttf", 96)
-
-	/*
-		dc.SetRGB(0, 0, 0)
-		dc.DrawStringAnchored("Words are in a nice font.", x, y, 0.5, 0.5)
-		dc.SetRGB(1, 1, 1)
-		dc.DrawStringAnchored("Words are in a nice font.", x-3, y-3, 0.5, 0.5)
-	*/
 
 	drawWordsWithColorOn(dc, -1, words)
 	for i, _ := range words {

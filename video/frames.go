@@ -14,3 +14,5 @@ func MakeFrames(filename, name, fps string) {
 	o, _ := cmd.CombinedOutput()
 	fmt.Println(string(o))
 }
+
+// ffmpeg -i perfect.mp4 -filter:v fps=fps=9 perfect9.mp4

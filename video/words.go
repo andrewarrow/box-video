@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"io/ioutil"
 	"os"
 
 	"github.com/fogleman/gg"
@@ -12,13 +13,23 @@ import (
 
 func MakeWords() {
 	RmRfBang()
+	dir := "nine"
+	files, _ := ioutil.ReadDir(dir)
+	for _, file := range files {
+		name := file.Name()
+		fmt.Println(name)
+		makeBoxFrame(dir, name)
+	}
+	ffmpeg("9")
+}
+
+func makeBoxFrame(dir, name string) {
 	dc := gg.NewContext(1920, 1080)
 	dc.SetRGB(0, 200, 200)
 	dc.Clear()
 
-	file, _ := os.Open("perfect/img0000001.png")
+	file, _ := os.Open(dir + "/" + name)
 	im, _ := png.Decode(file)
-
 	rgba := im.(*image.RGBA)
 
 	x := 660
@@ -33,7 +44,15 @@ func MakeWords() {
 	dc.DrawRectangle(650, 180, float64(w+20), float64(h+20))
 	dc.Fill()
 	dc.DrawImage(cropped, 0, 0)
-	dc.SavePNG(fmt.Sprintf("data/img%07d.png", 1))
+	count := 0
+	for {
+		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
+		frameCount++
+		count++
+		if count > 0 {
+			break
+		}
+	}
 }
 
 func MakeWords2() {
@@ -49,7 +68,7 @@ func MakeWords2() {
 	for i, _ := range words {
 		drawWordsWithColorOn(dc, i, words)
 	}
-	ffmpeg()
+	ffmpeg("29.97")
 }
 
 func drawWordsWithColorOn(dc *gg.Context, index int, words []string) {

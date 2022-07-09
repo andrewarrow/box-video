@@ -126,7 +126,7 @@ func MakeStars() {
 			break
 		}
 	}
-	ffmpeg()
+	ffmpeg("29.97")
 }
 
 func makeLineGoingUp(dc *gg.Context, i int) {
@@ -228,13 +228,13 @@ func MakeStars2() {
 		}
 		i++
 	}
-	ffmpeg()
+	ffmpeg("29.97")
 }
 
-func ffmpeg() {
+func ffmpeg(fps string) {
 	fmt.Println("ffmpeg")
 	//ffmpeg -framerate 29.97 -pattern_type glob -i data/*.png -c:v libx264 -pix_fmt yuv420p data/temp.mov
-	exec.Command("/usr/local/bin/ffmpeg", "-framerate", "29.97", "-pattern_type", "glob", "-i", "data/*.png", "-c:v", "libx264",
+	exec.Command("/usr/local/bin/ffmpeg", "-framerate", fps, "-pattern_type", "glob", "-i", "data/*.png", "-c:v", "libx264",
 		"-pix_fmt", "yuv420p", "data/temp.mov").CombinedOutput()
 	fmt.Println("ffmpeg")
 }

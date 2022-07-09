@@ -36,6 +36,10 @@ func main() {
 		video.MakeStars()
 	} else if command == "words" {
 		video.MakeWords()
+	} else if command == "sound" {
+		v := os.Args[2]
+		a := os.Args[3]
+		video.AddSound(v, a)
 	} else if command == "frames" {
 		file := os.Args[2]
 		name := os.Args[3]

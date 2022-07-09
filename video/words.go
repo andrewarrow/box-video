@@ -36,11 +36,13 @@ func drawWordsWithColorOn(dc *gg.Context, index int, words []string) {
 	for i, word := range words {
 		w, _ := dc.MeasureString(word)
 		fmt.Println(w, word, x)
+		dc.SetRGB(0, 0, 0)
+		dc.DrawString(word, x, y)
 		dc.SetRGB(1, 1, 1)
 		if i == index {
 			dc.SetRGB(255, 1, 1)
 		}
-		dc.DrawString(word, x, y)
+		dc.DrawString(word, x-3, y-3)
 		x += w + 23
 	}
 

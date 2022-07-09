@@ -20,79 +20,80 @@ reality is perfect.
 
 type Word struct {
 	Word         string
-	MilliSeconds int
+	Milliseconds int
 }
 
 func MakeWords() {
 	RmRfBang()
 
-	w := Word{"So", 500}
+	w := Word{"So", 250}
 	line := []Word{w}
-	w = Word{"then", 500}
+	w = Word{"then", 375}
 	line = append(line, w)
-	w = Word{"you", 500}
+	w = Word{"you", 250}
 	line = append(line, w)
-	w = Word{"see", 500}
+	w = Word{"see", 375}
 	line = append(line, w)
-	w = Word{"the", 500}
+	w = Word{"the", 125}
 	line = append(line, w)
-	w = Word{"deeper", 900}
+	w = Word{"deeper", 875}
 	line = append(line, w)
-	w = Word{"layer", 800}
+	w = Word{"layer", 875}
 	line = append(line, w)
 
 	lines := [][]Word{line}
 
-	w = Word{"of", 500}
+	w = Word{"of", 250}
 	line = []Word{w}
-	w = Word{"reality", 900}
+	w = Word{"reality", 875}
 	line = append(line, w)
-	w = Word{"of", 300}
+	w = Word{"of", 125}
 	line = append(line, w)
-	w = Word{"oh,", 300}
+	w = Word{"oh,", 250}
 	line = append(line, w)
-	w = Word{"everyone", 900}
+	w = Word{"everyone", 875}
 	line = append(line, w)
-	w = Word{"is", 200}
+	w = Word{"is", 250}
 	line = append(line, w)
-	w = Word{"acting", 900}
+	w = Word{"acting", 875}
 	line = append(line, w)
 
 	lines = append(lines, line)
 
-	w = Word{"perfectly", 1100}
+	w = Word{"perfectly", 1125}
 	line = []Word{w}
 	w = Word{"according", 1000}
 	line = append(line, w)
-	w = Word{"to", 300}
+	w = Word{"to", 250}
 	line = append(line, w)
-	w = Word{"their", 400}
+	w = Word{"their", 375}
 	line = append(line, w)
-	w = Word{"state", 900}
-	line = append(line, w)
-	lines = append(lines, line)
-
-	w = Word{"of", 100}
-	line = []Word{w}
-	w = Word{"consciousness.", 1600}
-	line = append(line, w)
-	w = Word{"And", 300}
-	line = append(line, w)
-	w = Word{"that's,", 400}
-	line = append(line, w)
-	w = Word{"why", 400}
+	w = Word{"state", 875}
 	line = append(line, w)
 	lines = append(lines, line)
 
-	w = Word{"reality", 1000}
+	w = Word{"of", 125}
 	line = []Word{w}
-	w = Word{"is", 100}
+	w = Word{"consciousness.", 1125}
 	line = append(line, w)
-	w = Word{"perfect.", 600}
+	w = Word{"And", 375}
+	line = append(line, w)
+	w = Word{"that's", 375}
+	line = append(line, w)
+	w = Word{"why", 375}
+	line = append(line, w)
+	lines = append(lines, line)
+
+	w = Word{"reality", 1125}
+	line = []Word{w}
+	w = Word{"is", 125}
+	line = append(line, w)
+	w = Word{"perfect.", 875}
 	line = append(line, w)
 	lines = append(lines, line)
 
 	fmt.Println(lines)
+	wordsFromLines(lines)
 }
 
 func foo() {
@@ -138,46 +139,66 @@ func makeBoxFrame(dir, name string) {
 	}
 }
 
-func MakeWords2() {
-	RmRfBang()
+func wordsFromLines(lines [][]Word) {
 
-	words := []string{"Words", "are", "in", "a", "nice", "font."}
-	dc := gg.NewContext(1920, 1080)
-	dc.SetRGB(0, 200, 200)
-	dc.Clear()
-	dc.LoadFontFace("arialbd.ttf", 96)
+	for _, line := range lines {
+		dc := gg.NewContext(1920, 1080)
+		dc.SetRGB(0, 200, 200)
+		dc.Clear()
+		dc.LoadFontFace("arialbd.ttf", 96)
 
-	drawWordsWithColorOn(dc, -1, words)
-	for i, _ := range words {
-		drawWordsWithColorOn(dc, i, words)
+		for i, _ := range line {
+			drawWordsWithColorOn(dc, i, line)
+		}
 	}
-	ffmpeg("29.97")
+
+	ffmpeg("9")
 }
 
-func drawWordsWithColorOn(dc *gg.Context, index int, words []string) {
+func drawWordsWithColorOn(dc *gg.Context, index int, words []Word) {
 	x := 200.0
 	y := 900.0
 	dc.SetRGB(1, 1, 1)
 	for i, word := range words {
-		w, _ := dc.MeasureString(word)
-		fmt.Println(w, word, x)
+		w, _ := dc.MeasureString(word.Word)
+		fmt.Println(w, word.Word, x)
 		dc.SetRGB(0, 0, 0)
-		dc.DrawString(word, x, y)
+		dc.DrawString(word.Word, x, y)
 		dc.SetRGB(1, 1, 1)
 		if i == index {
 			dc.SetRGB(255, 1, 1)
 		}
-		dc.DrawString(word, x-3, y-3)
+		dc.DrawString(word.Word, x-3, y-3)
 		x += w + 23
+	}
+
+	ms := words[index].Milliseconds
+	breakAt := 1
+	if ms == 250 {
+		breakAt = 2
+	} else if ms == 375 {
+		breakAt = 3
+	} else if ms == 500 {
+		breakAt = 4
+	} else if ms == 625 {
+		breakAt = 5
+	} else if ms == 750 {
+		breakAt = 6
+	} else if ms == 875 {
+		breakAt = 7
+	} else if ms == 1000 {
+		breakAt = 8
+	} else if ms == 1125 {
+		breakAt = 9
 	}
 
 	count := 0
 	for {
 		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
+		frameCount++
 		count++
-		if count > 30 {
+		if count > breakAt {
 			break
 		}
-		frameCount++
 	}
 }

@@ -96,21 +96,9 @@ func MakeWords() {
 	wordsFromLines(lines)
 }
 
-func foo() {
-	dir := "nine"
-	files, _ := ioutil.ReadDir(dir)
-	for _, file := range files {
-		name := file.Name()
-		fmt.Println(name)
-		makeBoxFrame(dir, name)
-	}
-	ffmpeg("9")
-}
-
-func makeBoxFrame(dir, name string) {
-	dc := gg.NewContext(1920, 1080)
-	dc.SetRGB(0, 200, 200)
-	dc.Clear()
+func makeBoxFrame(i int, dir, name string) {
+	existing, _ := gg.LoadPNG(fmt.Sprintf("data/img%07d.png", i))
+	dc := gg.NewContextForImage(existing)
 
 	file, _ := os.Open(dir + "/" + name)
 	im, _ := png.Decode(file)
@@ -128,15 +116,7 @@ func makeBoxFrame(dir, name string) {
 	dc.DrawRectangle(650, 180, float64(w+20), float64(h+20))
 	dc.Fill()
 	dc.DrawImage(cropped, 0, 0)
-	count := 0
-	for {
-		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
-		frameCount++
-		count++
-		if count > 0 {
-			break
-		}
-	}
+	dc.SavePNG(fmt.Sprintf("data/img%07d.png", i))
 }
 
 func wordsFromLines(lines [][]Word) {
@@ -152,6 +132,13 @@ func wordsFromLines(lines [][]Word) {
 		}
 	}
 
+	dir := "nine"
+	files, _ := ioutil.ReadDir(dir)
+	for i, file := range files {
+		name := file.Name()
+		fmt.Println(name)
+		makeBoxFrame(i, dir, name)
+	}
 	ffmpeg("9")
 }
 

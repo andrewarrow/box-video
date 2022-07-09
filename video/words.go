@@ -7,93 +7,61 @@ import (
 	"image/png"
 	"io/ioutil"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/fogleman/gg"
 )
 
-var text = `So then you see the deeper layer
-of reality of oh, everyone is acting
-perfectly according to their state
-of consciousness. And that's why
-reality is perfect.
-`
-
 type Word struct {
-	Word         string
-	Milliseconds int
+	Word string
+	Time int
 }
 
-func MakeWords() {
+func MakeWords(filename string) {
 	RmRfBang()
 
-	w := Word{"So", 125}
-	line := []Word{w}
-	w = Word{"then", 125}
-	line = append(line, w)
-	w = Word{"you", 125}
-	line = append(line, w)
-	w = Word{"see", 125}
-	line = append(line, w)
-	w = Word{"the", 125}
-	line = append(line, w)
-	w = Word{"deeper", 250}
-	line = append(line, w)
-	w = Word{"layer", 250}
-	line = append(line, w)
-
-	lines := [][]Word{line}
-
-	w = Word{"of", 250}
-	line = []Word{w}
-	w = Word{"reality", 250}
-	line = append(line, w)
-	w = Word{"of", 125}
-	line = append(line, w)
-	w = Word{"oh,", 250}
-	line = append(line, w)
-	w = Word{"everyone", 250}
-	line = append(line, w)
-	w = Word{"is", 250}
-	line = append(line, w)
-	w = Word{"acting", 250}
-	line = append(line, w)
-
-	lines = append(lines, line)
-
-	w = Word{"perfectly", 1000}
-	line = []Word{w}
-	w = Word{"according", 125}
-	line = append(line, w)
-	w = Word{"to", 125}
-	line = append(line, w)
-	w = Word{"their", 125}
-	line = append(line, w)
-	w = Word{"state", 125}
-	line = append(line, w)
-	lines = append(lines, line)
-
-	w = Word{"of", 125}
-	line = []Word{w}
-	w = Word{"consciousness.", 1000}
-	line = append(line, w)
-	w = Word{"And", 250}
-	line = append(line, w)
-	w = Word{"that's", 250}
-	line = append(line, w)
-	w = Word{"why", 125}
-	line = append(line, w)
-	lines = append(lines, line)
-
-	w = Word{"reality", 125}
-	line = []Word{w}
-	w = Word{"is", 250}
-	line = append(line, w)
-	w = Word{"perfect.", 250}
-	line = append(line, w)
-	lines = append(lines, line)
-
+	/*
+		wordsFromLines(lines)
+	*/
+	lines := ReadWordTimes(filename)
 	fmt.Println(lines)
-	wordsFromLines(lines)
+}
+
+func ReadWordTimes(filename string) [][]Word {
+	b, _ := ioutil.ReadFile(filename)
+
+	wordLines := [][]Word{}
+	lines := strings.Split(string(b), "\n")
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if len(trimmed) == 0 {
+			continue
+		}
+
+		tokens := strings.Split(trimmed, "|")
+		allWords := tokens[0]
+		allTimes := tokens[1]
+
+		words := strings.Split(allWords, " ")
+		times := strings.Split(allTimes, ",")
+
+		if len(words) != len(times) {
+			fmt.Println("!!!!")
+			os.Exit(1)
+			break
+		}
+
+		wordLine := []Word{}
+		for i, word := range words {
+			time, _ := strconv.Atoi(times[i])
+			w := Word{word, time}
+			wordLine = append(wordLine, w)
+		}
+		wordLines = append(wordLines, wordLine)
+	}
+
+	return wordLines
 }
 
 func makeBoxFrame(i int, dir, name string) {
@@ -162,32 +130,14 @@ func drawWordsWithColorOn(dc *gg.Context, index int, words []Word) {
 		x += w + 23
 	}
 
-	ms := words[index].Milliseconds
-	breakAt := 1
-	if ms == 250 {
-		breakAt = 2
-	} else if ms == 375 {
-		breakAt = 3
-	} else if ms == 500 {
-		breakAt = 4
-	} else if ms == 625 {
-		breakAt = 5
-	} else if ms == 750 {
-		breakAt = 6
-	} else if ms == 875 {
-		breakAt = 7
-	} else if ms == 1000 {
-		breakAt = 8
-	} else if ms == 1125 {
-		breakAt = 9
-	}
+	time := words[index].Time
 
 	count := 0
 	for {
 		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
 		count++
-		if count > breakAt {
+		if count > time {
 			break
 		}
 	}

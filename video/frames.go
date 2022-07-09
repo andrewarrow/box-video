@@ -4,14 +4,22 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 )
 
-// 59.96
-func MakeFrames(filename, name, fps string) {
+func MakeFrames(filename, name string) {
 	exec.Command("rm", "-rf", name).CombinedOutput()
 	os.Mkdir(name, 0755)
-	cmd := exec.Command("ffmpeg", "-i", filename, "-vf", fmt.Sprintf("fps=%s", fps), name+"/img%07d.png")
+
+	tokens := strings.Split(filename, "/")
+	file := tokens[len(tokens)-1]
+
+	cmd := exec.Command("ffmpeg", "-i", filename, "-filter:v", "fps=fps=9", name+"/fps_"+file)
 	o, _ := cmd.CombinedOutput()
+	fmt.Println(string(o))
+
+	cmd = exec.Command("ffmpeg", "-i", name+"/fps_"+file, "-vf", "fps=9", name+"/img%07d.png")
+	o, _ = cmd.CombinedOutput()
 	fmt.Println(string(o))
 }
 

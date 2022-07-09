@@ -35,7 +35,8 @@ func main() {
 	} else if command == "stars" {
 		video.MakeStars()
 	} else if command == "words" {
-		video.MakeWords()
+		file := os.Args[2]
+		video.MakeWords(file)
 	} else if command == "sound" {
 		v := os.Args[2]
 		a := os.Args[3]
@@ -43,8 +44,7 @@ func main() {
 	} else if command == "frames" {
 		file := os.Args[2]
 		name := os.Args[3]
-		fps := os.Args[4]
-		video.MakeFrames(file, name, fps)
+		video.MakeFrames(file, name)
 	} else if command == "title" {
 		title := os.Args[2]
 		dir := "/Users/aa/watts/joy/keep"

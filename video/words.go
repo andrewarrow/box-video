@@ -59,6 +59,39 @@ func MakeWords() {
 	line = append(line, w)
 
 	lines = append(lines, line)
+
+	w = Word{"perfectly", 1100}
+	line = []Word{w}
+	w = Word{"according", 1000}
+	line = append(line, w)
+	w = Word{"to", 300}
+	line = append(line, w)
+	w = Word{"their", 400}
+	line = append(line, w)
+	w = Word{"state", 900}
+	line = append(line, w)
+	lines = append(lines, line)
+
+	w = Word{"of", 100}
+	line = []Word{w}
+	w = Word{"consciousness.", 1600}
+	line = append(line, w)
+	w = Word{"And", 300}
+	line = append(line, w)
+	w = Word{"that's,", 400}
+	line = append(line, w)
+	w = Word{"why", 400}
+	line = append(line, w)
+	lines = append(lines, line)
+
+	w = Word{"reality", 1000}
+	line = []Word{w}
+	w = Word{"is", 100}
+	line = append(line, w)
+	w = Word{"perfect.", 600}
+	line = append(line, w)
+	lines = append(lines, line)
+
 	fmt.Println(lines)
 }
 

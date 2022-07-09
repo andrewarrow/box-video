@@ -28,67 +28,67 @@ func MakeWords() {
 
 	w := Word{"So", 250}
 	line := []Word{w}
-	w = Word{"then", 375}
+	w = Word{"then", 250}
 	line = append(line, w)
 	w = Word{"you", 250}
 	line = append(line, w)
-	w = Word{"see", 375}
+	w = Word{"see", 250}
 	line = append(line, w)
 	w = Word{"the", 125}
 	line = append(line, w)
-	w = Word{"deeper", 875}
+	w = Word{"deeper", 250}
 	line = append(line, w)
-	w = Word{"layer", 875}
+	w = Word{"layer", 250}
 	line = append(line, w)
 
 	lines := [][]Word{line}
 
 	w = Word{"of", 250}
 	line = []Word{w}
-	w = Word{"reality", 875}
+	w = Word{"reality", 250}
 	line = append(line, w)
 	w = Word{"of", 125}
 	line = append(line, w)
 	w = Word{"oh,", 250}
 	line = append(line, w)
-	w = Word{"everyone", 875}
+	w = Word{"everyone", 250}
 	line = append(line, w)
 	w = Word{"is", 250}
 	line = append(line, w)
-	w = Word{"acting", 875}
+	w = Word{"acting", 250}
 	line = append(line, w)
 
 	lines = append(lines, line)
 
-	w = Word{"perfectly", 1125}
+	w = Word{"perfectly", 250}
 	line = []Word{w}
-	w = Word{"according", 1000}
+	w = Word{"according", 250}
 	line = append(line, w)
 	w = Word{"to", 250}
 	line = append(line, w)
-	w = Word{"their", 375}
+	w = Word{"their", 250}
 	line = append(line, w)
-	w = Word{"state", 875}
+	w = Word{"state", 250}
 	line = append(line, w)
 	lines = append(lines, line)
 
 	w = Word{"of", 125}
 	line = []Word{w}
-	w = Word{"consciousness.", 1125}
+	w = Word{"consciousness.", 500}
 	line = append(line, w)
-	w = Word{"And", 375}
+	w = Word{"And", 250}
 	line = append(line, w)
-	w = Word{"that's", 375}
+	w = Word{"that's", 250}
 	line = append(line, w)
-	w = Word{"why", 375}
+	w = Word{"why", 250}
 	line = append(line, w)
 	lines = append(lines, line)
 
-	w = Word{"reality", 1125}
+	w = Word{"reality", 500}
 	line = []Word{w}
-	w = Word{"is", 125}
+	w = Word{"is", 250}
 	line = append(line, w)
-	w = Word{"perfect.", 875}
+	w = Word{"perfect.", 250}
 	line = append(line, w)
 	lines = append(lines, line)
 

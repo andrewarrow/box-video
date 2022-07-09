@@ -11,8 +11,58 @@ import (
 	"github.com/fogleman/gg"
 )
 
+var text = `So then you see the deeper layer
+of reality of oh, everyone is acting
+perfectly according to their state
+of consciousness. And that's why
+reality is perfect.
+`
+
+type Word struct {
+	Word         string
+	MilliSeconds int
+}
+
 func MakeWords() {
 	RmRfBang()
+
+	w := Word{"So", 500}
+	line := []Word{w}
+	w = Word{"then", 500}
+	line = append(line, w)
+	w = Word{"you", 500}
+	line = append(line, w)
+	w = Word{"see", 500}
+	line = append(line, w)
+	w = Word{"the", 500}
+	line = append(line, w)
+	w = Word{"deeper", 900}
+	line = append(line, w)
+	w = Word{"layer", 800}
+	line = append(line, w)
+
+	lines := [][]Word{line}
+
+	w = Word{"of", 500}
+	line = []Word{w}
+	w = Word{"reality", 900}
+	line = append(line, w)
+	w = Word{"of", 300}
+	line = append(line, w)
+	w = Word{"oh,", 300}
+	line = append(line, w)
+	w = Word{"everyone", 900}
+	line = append(line, w)
+	w = Word{"is", 200}
+	line = append(line, w)
+	w = Word{"acting", 900}
+	line = append(line, w)
+
+	lines = append(lines, line)
+	fmt.Println(lines)
+}
+
+func foo() {
 	dir := "nine"
 	files, _ := ioutil.ReadDir(dir)
 	for _, file := range files {

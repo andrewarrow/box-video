@@ -36,6 +36,11 @@ func main() {
 		video.MakeStars()
 	} else if command == "words" {
 		video.MakeWords()
+	} else if command == "frames" {
+		file := os.Args[2]
+		name := os.Args[3]
+		fps := os.Args[4]
+		video.MakeFrames(file, name, fps)
 	} else if command == "title" {
 		title := os.Args[2]
 		dir := "/Users/aa/watts/joy/keep"

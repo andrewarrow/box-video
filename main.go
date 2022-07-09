@@ -34,6 +34,8 @@ func main() {
 		audio.PlayForClip(file)
 	} else if command == "stars" {
 		video.MakeStars()
+	} else if command == "words" {
+		video.MakeWords()
 	} else if command == "title" {
 		title := os.Args[2]
 		dir := "/Users/aa/watts/joy/keep"

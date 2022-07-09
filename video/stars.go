@@ -67,13 +67,15 @@ func MakeStars() {
 		fmt.Println(count, i, frameCount)
 		makeLineGoingUp(dc, i)
 
+		count = 0
 		for _, star := range list {
 			if !star.On {
 				continue
 			}
-			chance := rand.Intn(100)
-			if chance <= i {
-				star.On = false
+			count++
+			star.On = false
+			if count > 900 {
+				break
 			}
 		}
 
@@ -95,13 +97,15 @@ func MakeStars() {
 		fmt.Println(count, i, frameCount)
 		makeLineGoingDown(dc, i)
 
+		count = 0
 		for _, star := range list {
 			if !star.On {
 				continue
 			}
-			chance := rand.Intn(100)
-			if chance <= i {
-				star.On = false
+			count++
+			star.On = false
+			if count > 900 {
+				break
 			}
 		}
 
@@ -110,11 +114,18 @@ func MakeStars() {
 			break
 		}
 	}
-	dc := gg.NewContext(1920, 1080)
-	dc.SetRGB(0, 0, 0)
-	dc.Clear()
-	makeLineGoingUp(dc, i)
-	makeLineGoingDown(dc, i)
+	count := 0
+	for {
+		dc := gg.NewContext(1920, 1080)
+		dc.SetRGB(0, 0, 0)
+		dc.Clear()
+		makeLineGoingUp(dc, i)
+		makeLineGoingDown(dc, i)
+		count++
+		if count > 90 {
+			break
+		}
+	}
 	ffmpeg()
 }
 

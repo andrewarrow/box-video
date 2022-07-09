@@ -14,8 +14,6 @@ func MakeWords() {
 	dc.SetRGB(0, 200, 200)
 	dc.Clear()
 	dc.LoadFontFace("arialbd.ttf", 96)
-	x := 200.0 //float64(1920 / 2)
-	y := float64(900)
 
 	/*
 		dc.SetRGB(0, 0, 0)
@@ -24,15 +22,35 @@ func MakeWords() {
 		dc.DrawStringAnchored("Words are in a nice font.", x-3, y-3, 0.5, 0.5)
 	*/
 
+	drawWordsWithColorOn(dc, -1, words)
+	for i, _ := range words {
+		drawWordsWithColorOn(dc, i, words)
+	}
+	ffmpeg()
+}
+
+func drawWordsWithColorOn(dc *gg.Context, index int, words []string) {
+	x := 200.0
+	y := 900.0
 	dc.SetRGB(1, 1, 1)
-	for _, word := range words {
+	for i, word := range words {
 		w, _ := dc.MeasureString(word)
 		fmt.Println(w, word, x)
 		dc.SetRGB(1, 1, 1)
+		if i == index {
+			dc.SetRGB(255, 1, 1)
+		}
 		dc.DrawString(word, x, y)
-
 		x += w + 23
 	}
 
-	dc.SavePNG(fmt.Sprintf("data/img%07d.png", 1))
+	count := 0
+	for {
+		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
+		count++
+		if count > 30 {
+			break
+		}
+		frameCount++
+	}
 }

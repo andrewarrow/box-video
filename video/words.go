@@ -26,13 +26,13 @@ type Word struct {
 func MakeWords() {
 	RmRfBang()
 
-	w := Word{"So", 250}
+	w := Word{"So", 125}
 	line := []Word{w}
-	w = Word{"then", 250}
+	w = Word{"then", 125}
 	line = append(line, w)
-	w = Word{"you", 250}
+	w = Word{"you", 125}
 	line = append(line, w)
-	w = Word{"see", 250}
+	w = Word{"see", 125}
 	line = append(line, w)
 	w = Word{"the", 125}
 	line = append(line, w)
@@ -60,31 +60,31 @@ func MakeWords() {
 
 	lines = append(lines, line)
 
-	w = Word{"perfectly", 250}
+	w = Word{"perfectly", 1000}
 	line = []Word{w}
-	w = Word{"according", 250}
+	w = Word{"according", 125}
 	line = append(line, w)
-	w = Word{"to", 250}
+	w = Word{"to", 125}
 	line = append(line, w)
-	w = Word{"their", 250}
+	w = Word{"their", 125}
 	line = append(line, w)
-	w = Word{"state", 250}
+	w = Word{"state", 125}
 	line = append(line, w)
 	lines = append(lines, line)
 
 	w = Word{"of", 125}
 	line = []Word{w}
-	w = Word{"consciousness.", 500}
+	w = Word{"consciousness.", 1000}
 	line = append(line, w)
 	w = Word{"And", 250}
 	line = append(line, w)
 	w = Word{"that's", 250}
 	line = append(line, w)
-	w = Word{"why", 250}
+	w = Word{"why", 125}
 	line = append(line, w)
 	lines = append(lines, line)
 
-	w = Word{"reality", 500}
+	w = Word{"reality", 125}
 	line = []Word{w}
 	w = Word{"is", 250}
 	line = append(line, w)
@@ -97,7 +97,10 @@ func MakeWords() {
 }
 
 func makeBoxFrame(i int, dir, name string) {
-	existing, _ := gg.LoadPNG(fmt.Sprintf("data/img%07d.png", i))
+	existing, e := gg.LoadPNG(fmt.Sprintf("data/img%07d.png", i))
+	if e != nil {
+		return
+	}
 	dc := gg.NewContextForImage(existing)
 
 	file, _ := os.Open(dir + "/" + name)

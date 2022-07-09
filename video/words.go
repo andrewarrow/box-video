@@ -21,11 +21,9 @@ type Word struct {
 func MakeWords(filename string) {
 	RmRfBang()
 
-	/*
-		wordsFromLines(lines)
-	*/
 	lines := ReadWordTimes(filename)
 	fmt.Println(lines)
+	wordsFromLines(lines)
 }
 
 func ReadWordTimes(filename string) [][]Word {

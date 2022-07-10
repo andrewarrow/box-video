@@ -55,6 +55,10 @@ func PlayForClip(filename string) {
 			term.Restore(int(os.Stdin.Fd()), oldState)
 			fmt.Println("")
 			break
+		} else if c == 45 { // -
+			words[wordIndex].Time -= 100
+		} else if c == 61 { // +
+			words[wordIndex].Time += 100
 		} else if c == 108 { // L
 			speaker.Lock()
 			streamer.Seek(streamer.Position() + 100000)
@@ -99,7 +103,7 @@ type Word struct {
 }
 
 func DisplayWords() {
-	i := 0
+	wordIndex = 0
 	wordChars = 0
 	for {
 		if wordReset {
@@ -107,12 +111,13 @@ func DisplayWords() {
 			break
 		}
 		wordMutex.Lock()
-		wordChars += len(words[i].Word) + 1
-		fmt.Printf("%s ", words[i].Word)
+		txt := fmt.Sprintf("%s(%d) ", words[wordIndex].Word, words[wordIndex].Time)
+		wordChars += len(txt)
+		fmt.Printf(txt)
 		wordMutex.Unlock()
-		time.Sleep(time.Millisecond * time.Duration(words[i].Time))
-		i++
-		if i >= len(words) {
+		time.Sleep(time.Millisecond * time.Duration(words[wordIndex].Time))
+		wordIndex++
+		if wordIndex >= len(words) {
 			break
 		}
 	}

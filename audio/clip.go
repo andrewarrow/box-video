@@ -57,10 +57,13 @@ func PlayForClip(filename string) {
 			break
 		} else if c >= 48 && c <= 57 { // 0-9
 			wordIndex = int(c) - 48
+			wordChange = true
 		} else if c == 45 { // -
 			words[wordIndex].Time -= 100
+			wordChange = true
 		} else if c == 61 { // +
 			words[wordIndex].Time += 100
+			wordChange = true
 		} else if c == 108 { // L
 			speaker.Lock()
 			streamer.Seek(streamer.Position() + 100000)
@@ -95,6 +98,7 @@ func PlayForClip(filename string) {
 
 }
 
+var wordChange = false
 var wordIndex = 0
 var wordChars = 0
 var wordReset = false
@@ -107,6 +111,47 @@ type Word struct {
 }
 
 func DisplayWords() {
+	i := 0
+	wordChange = true
+	for {
+		if wordChange == false {
+			time.Sleep(time.Millisecond * 1)
+			continue
+		}
+
+		for i := 0; i < wordChars; i++ {
+			fmt.Printf("\b")
+		}
+		for i := 0; i < wordChars; i++ {
+			fmt.Printf(" ")
+		}
+		for i := 0; i < wordChars; i++ {
+			fmt.Printf("\b")
+		}
+		wordChars = 0
+		for i, word := range words {
+			txt := fmt.Sprintf("%s(%d) ", word.Word, word.Time)
+			if i == wordIndex {
+				txt = fmt.Sprintf("[%s(%d)] ", word.Word, word.Time)
+			}
+			wordChars += len(txt)
+			fmt.Printf(txt)
+		}
+
+		wordChange = false
+
+	}
+
+	for {
+		i++
+		if i >= len(words) {
+			i = 0
+		}
+
+	}
+}
+
+func DisplayWords2() {
 	wordIndex = 0
 	wordChars = 0
 	for {

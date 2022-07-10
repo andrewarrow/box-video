@@ -13,7 +13,8 @@ import (
 )
 
 func PlayForClip(filename, wordfile string) {
-	ReadWordTimes(wordfile)
+	ReadWords(wordfile)
+	ReadTimes("times.txt")
 
 	f, _ := os.Open(filename)
 	var streamer beep.StreamSeekCloser

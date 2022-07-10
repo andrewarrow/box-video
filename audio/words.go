@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -34,7 +35,7 @@ func SaveTimes() {
 	ioutil.WriteFile(fname, []byte(data), 0644)
 }
 
-func ReadWordTimes(filename string) {
+func ReadWords(filename string) {
 	b, _ := ioutil.ReadFile(filename)
 
 	wordLines = [][]*Word{}
@@ -53,5 +54,20 @@ func ReadWordTimes(filename string) {
 			wordLine = append(wordLine, &w)
 		}
 		wordLines = append(wordLines, wordLine)
+	}
+}
+
+func ReadTimes(filename string) {
+	b, _ := ioutil.ReadFile(filename)
+
+	lines := strings.Split(string(b), "\n")
+	for i, line := range lines {
+
+		times := strings.Split(line, ",")
+
+		for j, time := range times {
+			timeInt, _ := strconv.Atoi(time)
+			wordLines[i][j].Time = timeInt
+		}
 	}
 }

@@ -1,7 +1,9 @@
 package audio
 
 import (
+	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -15,6 +17,21 @@ var words []*Word
 type Word struct {
 	Word string
 	Time int
+}
+
+func SaveTimes() {
+	fname := "times.txt"
+	os.Remove(fname)
+	buff := []string{}
+	for _, line := range wordLines {
+		b := []string{}
+		for _, word := range line {
+			b = append(b, fmt.Sprintf("%d", word.Time))
+		}
+		buff = append(buff, strings.Join(b, ","))
+	}
+	data := strings.Join(buff, "\n")
+	ioutil.WriteFile(fname, []byte(data), 0644)
 }
 
 func ReadWordTimes(filename string) {

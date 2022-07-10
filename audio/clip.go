@@ -52,6 +52,9 @@ func PlayForClip(filename, wordfile string) {
 			speaker.Lock()
 			term.Restore(int(os.Stdin.Fd()), oldState)
 			fmt.Println("")
+			fmt.Println("Saving times...")
+			SaveTimes()
+			fmt.Println("")
 			break
 		} else if c >= 48 && c <= 57 { // 0-9
 			wordIndex = int(c) - 48

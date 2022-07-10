@@ -31,7 +31,7 @@ func PlayForClip(filename string) {
 		Silent:   false,
 	}
 	speedy := beep.ResampleRatio(4, 1, volume)
-	speedy.SetRatio(speedy.Ratio() - 0.5)
+	//speedy.SetRatio(speedy.Ratio() - 0.5)
 
 	speaker.Play(speedy)
 
@@ -59,6 +59,12 @@ func PlayForClip(filename string) {
 		} else if c >= 48 && c <= 57 { // 0-9
 			wordIndex = int(c) - 48
 			wordChange = true
+		} else if c == 67 { // ->
+			wordIndex += 1
+			wordChange = true
+		} else if c == 68 { // <-
+			wordIndex -= 1
+			wordChange = true
 		} else if c == 45 { // -
 			words[wordIndex].Time -= 100
 			wordChange = true
@@ -75,12 +81,16 @@ func PlayForClip(filename string) {
 		} else if c == 106 { // J
 			speaker.Lock()
 			streamer.Seek(0)
+			ctrl.Paused = true
+			globalPauseOn = true
+			speaker.Unlock()
+			wordMutex.Lock()
 			wordIndex = 0
 			wordChange = true
+			wordMutex.Unlock()
 			//globalFrom = streamer.Position()
 			//percentDone := float64(globalFrom) / float64(globalMaxLength)
 			//fmt.Printf("%s\b\b", "ih")
-			speaker.Unlock()
 		} else if c == 107 || c == 32 { // K or space
 			speaker.Lock()
 			if ctrl.Paused == false {
@@ -111,7 +121,6 @@ type Word struct {
 }
 
 func DisplayWords() {
-	i := 0
 	wordChange = true
 	for {
 		if wordChange == false {
@@ -139,15 +148,6 @@ func DisplayWords() {
 		}
 
 		wordChange = false
-
-	}
-
-	for {
-		i++
-		if i >= len(words) {
-			i = 0
-		}
-
 	}
 }
 
@@ -158,7 +158,9 @@ func IncrementWordIndex() {
 			time.Sleep(time.Millisecond * 1)
 			continue
 		}
+		wordMutex.Lock()
 		time.Sleep(time.Millisecond * time.Duration(words[wordIndex].Time))
+		wordMutex.Unlock()
 		wordIndex++
 		wordChange = true
 		if wordIndex >= len(words) {

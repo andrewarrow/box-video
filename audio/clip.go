@@ -3,7 +3,6 @@ package audio
 import (
 	"fmt"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/faiface/beep"
@@ -24,6 +23,8 @@ func PlayForClip(filename string) {
 	speaker.Init(globalFormat.SampleRate, globalFormat.SampleRate.N(time.Second/10))
 
 	ctrl := &beep.Ctrl{Streamer: beep.Loop(-1, streamer), Paused: false}
+	ctrl.Paused = true
+	globalPauseOn = true
 	volume := &effects.Volume{
 		Streamer: ctrl,
 		Base:     2,
@@ -37,7 +38,7 @@ func PlayForClip(filename string) {
 
 	oldState, _ := term.MakeRaw(int(os.Stdin.Fd()))
 
-	ego := Word{"Ego", 1000}
+	ego := Word{"Ego", 500}
 	is := Word{"is", 2000}
 	the := Word{"the", 2000}
 	minds := Word{"mind's", 2000}
@@ -59,10 +60,10 @@ func PlayForClip(filename string) {
 		} else if c >= 48 && c <= 57 { // 0-9
 			wordIndex = int(c) - 48
 			wordChange = true
-		} else if c == 67 { // ->
+		} else if c == 67 || c == 93 { // -> ]
 			wordIndex += 1
 			wordChange = true
-		} else if c == 68 { // <-
+		} else if c == 68 || c == 91 { // <- [
 			wordIndex -= 1
 			wordChange = true
 		} else if c == 45 { // -
@@ -81,13 +82,7 @@ func PlayForClip(filename string) {
 		} else if c == 106 { // J
 			speaker.Lock()
 			streamer.Seek(0)
-			ctrl.Paused = true
-			globalPauseOn = true
 			speaker.Unlock()
-			wordMutex.Lock()
-			wordIndex = 0
-			wordChange = true
-			wordMutex.Unlock()
 			//globalFrom = streamer.Position()
 			//percentDone := float64(globalFrom) / float64(globalMaxLength)
 			//fmt.Printf("%s\b\b", "ih")
@@ -99,6 +94,7 @@ func PlayForClip(filename string) {
 				ctrl.Paused = true
 			} else {
 				globalFrom = streamer.Position()
+				streamer.Seek(0)
 				globalPauseOn = false
 				ctrl.Paused = false
 			}
@@ -111,8 +107,6 @@ func PlayForClip(filename string) {
 var wordChange = false
 var wordIndex = 0
 var wordChars = 0
-var wordReset = false
-var wordMutex sync.Mutex
 var words []*Word
 
 type Word struct {
@@ -124,7 +118,7 @@ func DisplayWords() {
 	wordChange = true
 	for {
 		if wordChange == false {
-			time.Sleep(time.Millisecond * 1)
+			time.Sleep(time.Nanosecond * 10)
 			continue
 		}
 
@@ -153,14 +147,13 @@ func DisplayWords() {
 
 func IncrementWordIndex() {
 	wordIndex = 0
+	wordChange = true
 	for {
 		if globalPauseOn {
-			time.Sleep(time.Millisecond * 1)
+			time.Sleep(time.Nanosecond * 10)
 			continue
 		}
-		wordMutex.Lock()
 		time.Sleep(time.Millisecond * time.Duration(words[wordIndex].Time))
-		wordMutex.Unlock()
 		wordIndex++
 		wordChange = true
 		if wordIndex >= len(words) {

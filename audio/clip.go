@@ -60,10 +60,10 @@ func PlayForClip(filename string) {
 		} else if c >= 48 && c <= 57 { // 0-9
 			wordIndex = int(c) - 48
 			wordChange = true
-		} else if c == 67 || c == 93 { // -> ]
+		} else if (c == 67 || c == 93) && wordIndex < len(words)-1 { // -> ]
 			wordIndex += 1
 			wordChange = true
-		} else if c == 68 || c == 91 { // <- [
+		} else if (c == 68 || c == 91) && wordIndex > 0 { // <- [
 			wordIndex -= 1
 			wordChange = true
 		} else if c == 45 { // -

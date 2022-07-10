@@ -38,11 +38,11 @@ func PlayForClip(filename string) {
 	oldState, _ := term.MakeRaw(int(os.Stdin.Fd()))
 
 	ego := Word{"Ego", 1000}
-	is := Word{"is", 1000}
-	the := Word{"the", 1000}
-	minds := Word{"mind's", 1000}
-	war := Word{"war", 1000}
-	against := Word{"against", 1000}
+	is := Word{"is", 2000}
+	the := Word{"the", 2000}
+	minds := Word{"mind's", 2000}
+	war := Word{"war", 2000}
+	against := Word{"against", 2000}
 	words = []*Word{&ego, &is, &the, &minds, &war, &against}
 	go DisplayWords()
 
@@ -75,6 +75,7 @@ func PlayForClip(filename string) {
 			//fmt.Printf("%s\b\b", "ih")
 			speaker.Unlock()
 		} else if c == 107 || c == 32 { // K or space
+			wordMutex.Lock()
 			speaker.Lock()
 			if ctrl.Paused == false {
 				globalTo = streamer.Position()
@@ -82,10 +83,11 @@ func PlayForClip(filename string) {
 				ctrl.Paused = true
 			} else {
 				globalFrom = streamer.Position()
-				globalPauseOff = true
+				globalPauseOn = false
 				ctrl.Paused = false
 			}
 			speaker.Unlock()
+			wordMutex.Unlock()
 		}
 	}
 
@@ -110,12 +112,16 @@ func DisplayWords() {
 			wordReset = false
 			break
 		}
+		if globalPauseOn {
+			time.Sleep(time.Millisecond * 1)
+			continue
+		}
 		wordMutex.Lock()
 		txt := fmt.Sprintf("%s(%d) ", words[wordIndex].Word, words[wordIndex].Time)
 		wordChars += len(txt)
 		fmt.Printf(txt)
-		wordMutex.Unlock()
 		time.Sleep(time.Millisecond * time.Duration(words[wordIndex].Time))
+		wordMutex.Unlock()
 		wordIndex++
 		if wordIndex >= len(words) {
 			break

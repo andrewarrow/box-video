@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+var wordLines [][]*Word
+var wordLineIndex = 0
 var wordChange = false
 var wordIndex = 0
 var wordChars = 0
@@ -15,10 +17,10 @@ type Word struct {
 	Time int
 }
 
-func ReadWordTimes(filename string) [][]Word {
+func ReadWordTimes(filename string) {
 	b, _ := ioutil.ReadFile(filename)
 
-	wordLines := [][]Word{}
+	wordLines = [][]*Word{}
 	lines := strings.Split(string(b), "\n")
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
@@ -28,13 +30,11 @@ func ReadWordTimes(filename string) [][]Word {
 
 		words := strings.Split(trimmed, " ")
 
-		wordLine := []Word{}
+		wordLine := []*Word{}
 		for _, word := range words {
 			w := Word{word, 1000}
-			wordLine = append(wordLine, w)
+			wordLine = append(wordLine, &w)
 		}
 		wordLines = append(wordLines, wordLine)
 	}
-
-	return wordLines
 }

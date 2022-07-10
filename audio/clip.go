@@ -13,8 +13,7 @@ import (
 )
 
 func PlayForClip(filename, wordfile string) {
-	lines := ReadWordTimes(wordfile)
-	fmt.Println(lines)
+	ReadWordTimes(wordfile)
 
 	f, _ := os.Open(filename)
 	var streamer beep.StreamSeekCloser
@@ -41,13 +40,7 @@ func PlayForClip(filename, wordfile string) {
 
 	oldState, _ := term.MakeRaw(int(os.Stdin.Fd()))
 
-	ego := Word{"Ego", 500}
-	is := Word{"is", 2000}
-	the := Word{"the", 2000}
-	minds := Word{"mind's", 2000}
-	war := Word{"war", 2000}
-	against := Word{"against", 2000}
-	words = []*Word{&ego, &is, &the, &minds, &war, &against}
+	words = wordLines[wordLineIndex]
 	go DisplayWords()
 	go IncrementWordIndex()
 
@@ -98,7 +91,10 @@ func PlayForClip(filename, wordfile string) {
 			} else {
 				globalFrom = streamer.Position()
 				streamer.Seek(0)
+				wordLineIndex = 0
+				words = wordLines[wordLineIndex]
 				wordIndex = 0
+				wordChange = true
 				globalPauseOn = false
 				ctrl.Paused = false
 			}
@@ -149,9 +145,11 @@ func IncrementWordIndex() {
 		}
 		time.Sleep(time.Millisecond * time.Duration(words[wordIndex].Time))
 		wordIndex++
-		wordChange = true
 		if wordIndex >= len(words) {
-			break
+			wordLineIndex++
+			words = wordLines[wordLineIndex]
+			wordIndex = 0
 		}
+		wordChange = true
 	}
 }

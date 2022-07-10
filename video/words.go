@@ -7,8 +7,6 @@ import (
 	"image/png"
 	"io/ioutil"
 	"os"
-	"strconv"
-	"strings"
 
 	"github.com/fogleman/gg"
 )
@@ -23,9 +21,7 @@ var wordsTo = 35
 func MakeWords(filename string) {
 	RmRfBang()
 
-	lines := ReadWordTimes(filename)
-	fmt.Println(lines)
-	wordsFromLines(lines[0:wordsTo])
+	//wordsFromLines(lines[0:wordsTo])
 }
 
 func wordsFromLines(lines [][]Word) {
@@ -108,40 +104,4 @@ func drawWordsWithColorOn(dc *gg.Context, index int, words []Word) {
 			break
 		}
 	}
-}
-
-func ReadWordTimes(filename string) [][]Word {
-	b, _ := ioutil.ReadFile(filename)
-
-	wordLines := [][]Word{}
-	lines := strings.Split(string(b), "\n")
-	for _, line := range lines {
-		trimmed := strings.TrimSpace(line)
-		if len(trimmed) == 0 {
-			continue
-		}
-
-		tokens := strings.Split(trimmed, "|")
-		allWords := tokens[0]
-		allTimes := tokens[1]
-
-		words := strings.Split(allWords, " ")
-		times := strings.Split(allTimes, ",")
-
-		if len(words) != len(times) {
-			fmt.Println("!!!!")
-			os.Exit(1)
-			break
-		}
-
-		wordLine := []Word{}
-		for i, word := range words {
-			time, _ := strconv.Atoi(times[i])
-			w := Word{word, time}
-			wordLine = append(wordLine, w)
-		}
-		wordLines = append(wordLines, wordLine)
-	}
-
-	return wordLines
 }

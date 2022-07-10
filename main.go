@@ -31,7 +31,8 @@ func main() {
 		audio.Merge()
 	} else if command == "clip" {
 		file := os.Args[2]
-		audio.PlayForClip(file)
+		words := os.Args[3]
+		audio.PlayForClip(file, words)
 	} else if command == "stars" {
 		video.MakeStars()
 	} else if command == "words" {

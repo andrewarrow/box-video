@@ -12,7 +12,10 @@ import (
 	"golang.org/x/term"
 )
 
-func PlayForClip(filename string) {
+func PlayForClip(filename, wordfile string) {
+	lines := ReadWordTimes(wordfile)
+	fmt.Println(lines)
+
 	f, _ := os.Open(filename)
 	var streamer beep.StreamSeekCloser
 	streamer, globalFormat, _ = mp3.Decode(f)
@@ -95,6 +98,7 @@ func PlayForClip(filename string) {
 			} else {
 				globalFrom = streamer.Position()
 				streamer.Seek(0)
+				wordIndex = 0
 				globalPauseOn = false
 				ctrl.Paused = false
 			}
@@ -102,16 +106,6 @@ func PlayForClip(filename string) {
 		}
 	}
 
-}
-
-var wordChange = false
-var wordIndex = 0
-var wordChars = 0
-var words []*Word
-
-type Word struct {
-	Word string
-	Time int
 }
 
 func DisplayWords() {

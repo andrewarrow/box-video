@@ -45,6 +45,7 @@ func PlayForClip(filename string) {
 	against := Word{"against", 2000}
 	words = []*Word{&ego, &is, &the, &minds, &war, &against}
 	go DisplayWords()
+	go IncrementWordIndex()
 
 	for {
 		b := make([]byte, 1)
@@ -74,13 +75,13 @@ func PlayForClip(filename string) {
 		} else if c == 106 { // J
 			speaker.Lock()
 			streamer.Seek(0)
-			wordReset = true
+			wordIndex = 0
+			wordChange = true
 			//globalFrom = streamer.Position()
 			//percentDone := float64(globalFrom) / float64(globalMaxLength)
 			//fmt.Printf("%s\b\b", "ih")
 			speaker.Unlock()
 		} else if c == 107 || c == 32 { // K or space
-			wordMutex.Lock()
 			speaker.Lock()
 			if ctrl.Paused == false {
 				globalTo = streamer.Position()
@@ -92,7 +93,6 @@ func PlayForClip(filename string) {
 				ctrl.Paused = false
 			}
 			speaker.Unlock()
-			wordMutex.Unlock()
 		}
 	}
 
@@ -132,7 +132,7 @@ func DisplayWords() {
 		for i, word := range words {
 			txt := fmt.Sprintf("%s(%d) ", word.Word, word.Time)
 			if i == wordIndex {
-				txt = fmt.Sprintf("[%s(%d)] ", word.Word, word.Time)
+				txt = fmt.Sprintf("|%s(%d)| ", word.Word, word.Time)
 			}
 			wordChars += len(txt)
 			fmt.Printf(txt)
@@ -151,38 +151,18 @@ func DisplayWords() {
 	}
 }
 
-func DisplayWords2() {
+func IncrementWordIndex() {
 	wordIndex = 0
-	wordChars = 0
 	for {
-		if wordReset {
-			wordReset = false
-			break
-		}
 		if globalPauseOn {
 			time.Sleep(time.Millisecond * 1)
 			continue
 		}
-		wordMutex.Lock()
-		txt := fmt.Sprintf("%s(%d) ", words[wordIndex].Word, words[wordIndex].Time)
-		wordChars += len(txt)
-		fmt.Printf(txt)
 		time.Sleep(time.Millisecond * time.Duration(words[wordIndex].Time))
-		wordMutex.Unlock()
 		wordIndex++
+		wordChange = true
 		if wordIndex >= len(words) {
 			break
 		}
 	}
-
-	for i := 0; i < wordChars; i++ {
-		fmt.Printf("\b")
-	}
-	for i := 0; i < wordChars; i++ {
-		fmt.Printf(" ")
-	}
-	for i := 0; i < wordChars; i++ {
-		fmt.Printf("\b")
-	}
-	go DisplayWords()
 }

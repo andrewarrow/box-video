@@ -11,6 +11,7 @@ import (
 var pattern gg.Pattern = gg.NewSolidPattern(color.White)
 
 func MakeEight() {
+	RmRfBang()
 	dc := gg.NewContext(1920, 1080)
 	dc.SetRGB(0, 200, 200)
 	dc.Clear()
@@ -20,20 +21,20 @@ func MakeEight() {
 	y := 400.0
 
 	dc.SetRGB(0, 40, 255)
-	ArcWithDot(dc, x, y, 200, 0, 2.3)
+	dc.DrawArc(x, y, 200, 0, 2.3)
 	dc.Stroke()
 	dc.SetRGB(40, 0, 255)
-	ArcWithDot(dc, 60+x, 140+y, -200, 0, 2.3)
+	dc.DrawArc(60+x, 140+y, -200, 0, 2.3)
 	dc.Stroke()
 
 	x = 746.0
 	y = 246.0
 
 	dc.SetRGB(40, 0, 255)
-	ArcWithDot(dc, x, y, 200, 0, 2.3)
+	dc.DrawArc(x, y, 200, 0, 2.3)
 	dc.Stroke()
 	dc.SetRGB(0, 40, 255)
-	ArcWithDot(dc, 60+x, 140+y, -200, 0, 2.3)
+	dc.DrawArc(60+x, 140+y, -200, 0, 2.3)
 	dc.Stroke()
 
 	x = 1300.0
@@ -46,15 +47,33 @@ func MakeEight() {
 	dc.DrawLine(x, y, x-200, y+400)
 	dc.Stroke()
 
-	WhiteDot(dc, x, y)
+	MakeDotGoingDown(dc, x, y)
 
-	dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
+	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
+	ffmpeg("9")
 }
 
 func WhiteDot(dc *gg.Context, x, y float64) {
 	dc.SetFillStyle(pattern)
-	dc.DrawCircle(x, y, 6)
+	dc.DrawCircle(x, y, 24)
 	dc.Fill()
+}
+
+func MakeDotGoingDown(dc *gg.Context, x, y float64) {
+	myx := x
+	myy := y
+	var c *gg.Context
+	for {
+		fmt.Println(frameCount)
+		c = gg.NewContextForImage(dc.Image())
+		WhiteDot(c, myx, myy)
+		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
+		myy++
+		frameCount++
+		if myy > y+400 {
+			break
+		}
+	}
 }
 
 func ArcWithDot(dc *gg.Context, x, y, r, angle1, angle2 float64) {

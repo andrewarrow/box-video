@@ -6,6 +6,8 @@ import (
 	"math"
 
 	"github.com/fogleman/gg"
+	"github.com/golang/freetype/raster"
+	"golang.org/x/image/math/fixed"
 )
 
 var pattern gg.Pattern = gg.NewSolidPattern(color.White)
@@ -41,16 +43,39 @@ func MakeEight() {
 	y = 400.0
 
 	dc.SetRGB(40, 0, 255)
+	var p raster.Path
+	p.Start(Fixed(x, y))
+	fmt.Println(p)
+	p.Add1(Fixed(x+200, y+400))
+	fmt.Println(p)
+
+	var painter raster.Painter
+	painter = EightPainter{}
+	r := raster.NewRasterizer(int(x), int(y))
+	r.UseNonZeroWinding = true
+	r.Clear()
+	r.AddStroke(p, fix(24), raster.RoundCapper, raster.RoundJoiner)
+	r.Rasterize(painter)
+
 	dc.DrawLine(x, y, x+200, y+400)
 	dc.Stroke()
 	dc.SetRGB(0, 40, 255)
 	dc.DrawLine(x, y, x-200, y+400)
 	dc.Stroke()
 
-	MakeDotGoingDown(dc, x, y)
+	x, y = MakeDotGoingDown(dc, x, y)
+	MakeDotGoingUp(dc, x, y)
 
 	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
 	ffmpeg("9")
+}
+
+func Fixed(x, y float64) fixed.Point26_6 {
+	return fixed.Point26_6{fix(x), fix(y)}
+}
+
+func fix(x float64) fixed.Int26_6 {
+	return fixed.Int26_6(math.Round(x * 64))
 }
 
 func WhiteDot(dc *gg.Context, x, y float64) {
@@ -59,7 +84,15 @@ func WhiteDot(dc *gg.Context, x, y float64) {
 	dc.Fill()
 }
 
-func MakeDotGoingDown(dc *gg.Context, x, y float64) {
+type EightPainter struct{}
+
+func (ep EightPainter) Paint(ss []raster.Span, done bool) {
+	for _, s := range ss {
+		fmt.Println(s, done)
+	}
+}
+
+func MakeDotGoingDown(dc *gg.Context, x, y float64) (float64, float64) {
 	myx := x
 	myy := y
 	var c *gg.Context
@@ -68,12 +101,33 @@ func MakeDotGoingDown(dc *gg.Context, x, y float64) {
 		c = gg.NewContextForImage(dc.Image())
 		WhiteDot(c, myx, myy)
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
-		myy++
+		myy += 32
+		myx -= 32
 		frameCount++
 		if myy > y+400 {
 			break
 		}
 	}
+	return myx, myy
+}
+func MakeDotGoingUp(dc *gg.Context, x, y float64) (float64, float64) {
+	myx := x
+	myy := y
+	var c *gg.Context
+	for {
+		fmt.Println(frameCount)
+		c = gg.NewContextForImage(dc.Image())
+		WhiteDot(c, myx, myy)
+		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
+		myy -= 32
+		fmt.Println(myy, y)
+		myx += 32
+		frameCount++
+		if myy < y-420 {
+			break
+		}
+	}
+	return myx, myy
 }
 
 func ArcWithDot(dc *gg.Context, x, y, r, angle1, angle2 float64) {

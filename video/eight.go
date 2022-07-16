@@ -43,24 +43,6 @@ func MakeEight() {
 	y = 400.0
 
 	dc.SetRGB(40, 0, 255)
-	var p raster.Path
-	p.Start(Fixed(x, y))
-	fmt.Println(p)
-	p.Add1(Fixed(x+200, y+400))
-	fmt.Println(p)
-
-	painter := &EightPainter{}
-	painter.Points = []gg.Point{}
-
-	r := raster.NewRasterizer(1920, 1080)
-	r.UseNonZeroWinding = true
-	r.Clear()
-	fp := flattenPath(p)
-	rp := rasterPath(fp)
-	fmt.Println(rp)
-	r.AddStroke(rp, fix(24), raster.RoundCapper, raster.RoundJoiner)
-	r.Rasterize(painter)
-	fmt.Println(painter)
 
 	dc.DrawLine(x, y, x+200, y+400)
 	dc.Stroke()
@@ -68,7 +50,7 @@ func MakeEight() {
 	dc.DrawLine(x, y, x-200, y+400)
 	dc.Stroke()
 
-	painter.MakeDotGoingDown(dc)
+	MakeDotGoing(dc, x, y, x+200, y+400)
 
 	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
 	ffmpeg("9")
@@ -107,10 +89,26 @@ func (ep *EightPainter) Paint(ss []raster.Span, done bool) {
 	ep.Points = append(ep.Points, gg.Point{float64(last.X0), float64(last.Y)})
 }
 
-func (ep *EightPainter) MakeDotGoingDown(dc *gg.Context) {
+func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64) {
+
+	var p raster.Path
+	p.Start(Fixed(x1, y1))
+	fmt.Println(p)
+	p.Add1(Fixed(x2, y2))
+	fmt.Println(p)
+
+	ep := &EightPainter{}
+	ep.Points = []gg.Point{}
+
+	r := raster.NewRasterizer(1920, 1080)
+	r.UseNonZeroWinding = true
+	r.Clear()
+	r.AddStroke(p, fix(24), raster.RoundCapper, raster.RoundJoiner)
+	r.Rasterize(ep)
+
 	var c *gg.Context
 	for i, p := range ep.Points {
-		if i%2 == 0 {
+		if i%30 != 0 {
 			continue
 		}
 		fmt.Println(frameCount)
@@ -119,25 +117,6 @@ func (ep *EightPainter) MakeDotGoingDown(dc *gg.Context) {
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
 	}
-}
-func MakeDotGoingUp(dc *gg.Context, x, y float64) (float64, float64) {
-	myx := x
-	myy := y
-	var c *gg.Context
-	for {
-		fmt.Println(frameCount)
-		c = gg.NewContextForImage(dc.Image())
-		WhiteDot(c, myx, myy)
-		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
-		myy -= 32
-		fmt.Println(myy, y)
-		myx += 32
-		frameCount++
-		if myy < y-420 {
-			break
-		}
-	}
-	return myx, myy
 }
 
 func ArcWithDot(dc *gg.Context, x, y, r, angle1, angle2 float64) {

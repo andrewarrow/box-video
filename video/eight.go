@@ -51,10 +51,13 @@ func MakeEight() {
 
 	var painter raster.Painter
 	painter = EightPainter{}
-	r := raster.NewRasterizer(int(x), int(y))
+	r := raster.NewRasterizer(1920, 1080)
 	r.UseNonZeroWinding = true
 	r.Clear()
-	r.AddStroke(p, fix(24), raster.RoundCapper, raster.RoundJoiner)
+	fp := flattenPath(p)
+	rp := rasterPath(fp)
+	fmt.Println(rp)
+	r.AddStroke(rp, fix(24), raster.RoundCapper, raster.RoundJoiner)
 	r.Rasterize(painter)
 
 	dc.DrawLine(x, y, x+200, y+400)
@@ -87,9 +90,17 @@ func WhiteDot(dc *gg.Context, x, y float64) {
 type EightPainter struct{}
 
 func (ep EightPainter) Paint(ss []raster.Span, done bool) {
+	fmt.Println(" ")
+	lasty := ss[0].Y
+	last := ss[0]
 	for _, s := range ss {
-		fmt.Println(s, done)
+		if s.Y != lasty {
+			fmt.Println(last.X0, last.Y, done)
+		}
+		lasty = s.Y
+		last = s
 	}
+	fmt.Println(last.X0, last.Y, done)
 }
 
 func MakeDotGoingDown(dc *gg.Context, x, y float64) (float64, float64) {

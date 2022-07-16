@@ -49,8 +49,9 @@ func MakeEight() {
 	p.Add1(Fixed(x+200, y+400))
 	fmt.Println(p)
 
-	var painter raster.Painter
-	painter = EightPainter{}
+	painter := &EightPainter{}
+	painter.Points = []gg.Point{}
+
 	r := raster.NewRasterizer(1920, 1080)
 	r.UseNonZeroWinding = true
 	r.Clear()
@@ -59,6 +60,7 @@ func MakeEight() {
 	fmt.Println(rp)
 	r.AddStroke(rp, fix(24), raster.RoundCapper, raster.RoundJoiner)
 	r.Rasterize(painter)
+	fmt.Println(painter)
 
 	dc.DrawLine(x, y, x+200, y+400)
 	dc.Stroke()
@@ -66,8 +68,7 @@ func MakeEight() {
 	dc.DrawLine(x, y, x-200, y+400)
 	dc.Stroke()
 
-	x, y = MakeDotGoingDown(dc, x, y)
-	MakeDotGoingUp(dc, x, y)
+	painter.MakeDotGoingDown(dc)
 
 	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
 	ffmpeg("9")
@@ -87,39 +88,37 @@ func WhiteDot(dc *gg.Context, x, y float64) {
 	dc.Fill()
 }
 
-type EightPainter struct{}
+type EightPainter struct {
+	Points []gg.Point
+}
 
-func (ep EightPainter) Paint(ss []raster.Span, done bool) {
-	fmt.Println(" ")
+func (ep *EightPainter) Paint(ss []raster.Span, done bool) {
 	lasty := ss[0].Y
 	last := ss[0]
 	for _, s := range ss {
 		if s.Y != lasty {
-			fmt.Println(last.X0, last.Y, done)
+			//fmt.Println(last.X0, last.Y, done)
+			ep.Points = append(ep.Points, gg.Point{float64(last.X0), float64(last.Y)})
 		}
 		lasty = s.Y
 		last = s
 	}
-	fmt.Println(last.X0, last.Y, done)
+	//fmt.Println(last.X0, last.Y, done)
+	ep.Points = append(ep.Points, gg.Point{float64(last.X0), float64(last.Y)})
 }
 
-func MakeDotGoingDown(dc *gg.Context, x, y float64) (float64, float64) {
-	myx := x
-	myy := y
+func (ep *EightPainter) MakeDotGoingDown(dc *gg.Context) {
 	var c *gg.Context
-	for {
+	for i, p := range ep.Points {
+		if i%2 == 0 {
+			continue
+		}
 		fmt.Println(frameCount)
 		c = gg.NewContextForImage(dc.Image())
-		WhiteDot(c, myx, myy)
+		WhiteDot(c, p.X, p.Y)
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
-		myy += 32
-		myx -= 32
 		frameCount++
-		if myy > y+400 {
-			break
-		}
 	}
-	return myx, myy
 }
 func MakeDotGoingUp(dc *gg.Context, x, y float64) (float64, float64) {
 	myx := x

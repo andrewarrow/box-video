@@ -2,10 +2,13 @@ package video
 
 import (
 	"fmt"
+	"image/color"
 	"math"
 
 	"github.com/fogleman/gg"
 )
+
+var pattern gg.Pattern = gg.NewSolidPattern(color.White)
 
 func MakeEight() {
 	dc := gg.NewContext(1920, 1080)
@@ -43,7 +46,15 @@ func MakeEight() {
 	dc.DrawLine(x, y, x-200, y+400)
 	dc.Stroke()
 
+	WhiteDot(dc, x, y)
+
 	dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
+}
+
+func WhiteDot(dc *gg.Context, x, y float64) {
+	dc.SetFillStyle(pattern)
+	dc.DrawCircle(x, y, 6)
+	dc.Fill()
 }
 
 func ArcWithDot(dc *gg.Context, x, y, r, angle1, angle2 float64) {
@@ -73,4 +84,31 @@ func ArcWithDot(dc *gg.Context, x, y, r, angle1, angle2 float64) {
 		}
 		dc.QuadraticTo(cx, cy, x2, y2)
 	}
+}
+
+func QuadraticTo(x1, y1, x2, y2 float64) {
+	/*
+		if !dc.hasCurrent {
+			dc.MoveTo(x1, y1)
+		}
+		x1, y1 = dc.TransformPoint(x1, y1)
+		x2, y2 = dc.TransformPoint(x2, y2)
+		p1 := Point{x1, y1}
+		p2 := Point{x2, y2}
+		dc.strokePath.Add2(p1.Fixed(), p2.Fixed())
+		dc.fillPath.Add2(p1.Fixed(), p2.Fixed())
+		dc.current = p2*/
+}
+
+func LineTo(x, y float64) {
+	/*
+		if !dc.hasCurrent {
+			dc.MoveTo(x, y)
+		} else {
+			x, y = dc.TransformPoint(x, y)
+			p := Point{x, y}
+			dc.strokePath.Add1(p.Fixed())
+			dc.fillPath.Add1(p.Fixed())
+			dc.current = p
+		}*/
 }

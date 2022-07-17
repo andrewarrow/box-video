@@ -82,6 +82,7 @@ type EightPainter struct {
 	TheYsUniqSorted map[int][]int
 	AllXs           []int
 	AllYs           []int
+	YforX           map[int]int
 }
 
 /*
@@ -112,10 +113,23 @@ func dedupAndSort(v []int) []int {
 	return list
 }
 
+func (ep *EightPainter) FindSmallYForX(x int) float64 {
+	return float64(ep.YforX[x])
+}
+
+// 390: [1300, 1301, 1302]
+// 391: [1300, 1301, 1302]
+// 392: [1301, 1302, 1303]
+
 func (ep *EightPainter) DedupAndSortYs() {
 	xs := []int{}
 	ys := []int{}
 	for k, v := range ep.TheYs {
+		for _, x := range v {
+			if k < ep.YforX[x] || ep.YforX[x] == 0 {
+				ep.YforX[x] = k
+			}
+		}
 		ep.TheYsUniqSorted[k] = dedupAndSort(v)
 		xs = append(xs, v...)
 		ys = append(ys, k)
@@ -163,6 +177,7 @@ func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64,
 	ep.AppendAtEnd = appendAtEnd
 	ep.TheYs = map[int][]int{}
 	ep.TheYsUniqSorted = map[int][]int{}
+	ep.YforX = map[int]int{}
 
 	r := raster.NewRasterizer(1920, 1080)
 	r.UseNonZeroWinding = true
@@ -174,10 +189,10 @@ func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64,
 	fmt.Println(len(ep.AllYs))
 
 	var c *gg.Context
-	for i, x := range ep.AllXs {
+	for _, x := range ep.AllXs {
 		fmt.Println(frameCount)
 		c = gg.NewContextForImage(dc.Image())
-		ColorDot(c, float64(x), float64(ep.AllYs[i]), color)
+		ColorDot(c, float64(x), ep.FindSmallYForX(x), color)
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
 	}

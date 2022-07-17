@@ -5,6 +5,7 @@ import (
 	"image/color"
 	"math"
 	"sort"
+	"time"
 
 	"github.com/fogleman/gg"
 	"github.com/golang/freetype/raster"
@@ -49,31 +50,44 @@ func MakeEight() {
 
 	go ReadEightChannelData()
 
+	done := false
 	go func() {
-		EightLoop(false, false, false, false)
-		EightLoop(true, true, true, true)
+		for {
+			if done {
+				break
+			}
+			EightLoop(false, false, false, false)
+			EightLoop(true, true, true, true)
+		}
 	}()
 
-	x := 1300.0
-	y := 400.0
 	//gold := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
 	//red := color.RGBA{R: 255, G: 0, B: 0, A: 0xff}
 	//white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
 	//black := color.RGBA{R: 0, G: 0, B: 0, A: 0xff}
 
-	if true {
-		MakeDotGoing(x, y, x+200, y+400, true, false)
-		MakeDotGoing(x+200, y+400, x, y, false, true)
-		MakeDotGoing(x, y, x-200, y+400, true, true)
-		MakeDotGoing(x-200, y+400, x, y, false, false)
+	go func() {
+		for {
+			if done {
+				break
+			}
+			x := 1300.0
+			y := 400.0
+			MakeDotGoing(x, y, x+200, y+400, true, false)
+			MakeDotGoing(x+200, y+400, x, y, false, true)
+			MakeDotGoing(x, y, x-200, y+400, true, true)
+			MakeDotGoing(x-200, y+400, x, y, false, false)
 
-		MakeDotGoing(x, y, x+200, y+400, true, false)
-		MakeDotGoing(x+200, y+400, x, y, false, true)
-		MakeDotGoing(x, y, x-200, y+400, true, true)
-		MakeDotGoing(x-200, y+400, x, y, false, false)
-	}
+			MakeDotGoing(x, y, x+200, y+400, true, false)
+			MakeDotGoing(x+200, y+400, x, y, false, true)
+			MakeDotGoing(x, y, x-200, y+400, true, true)
+			MakeDotGoing(x-200, y+400, x, y, false, false)
+		}
+	}()
 
-	//time.Sleep(time.Second * 2)
+	time.Sleep(time.Second * 120)
+	done = true
+	time.Sleep(time.Second * 10)
 	ffmpeg("36")
 }
 
@@ -102,7 +116,7 @@ func EightContext() *gg.Context {
 	}
 	two := "+2"
 	if upsideDownLeft {
-		two = "-1"
+		two = "-2"
 	}
 	four := "+4"
 	if upsideDownLeft {

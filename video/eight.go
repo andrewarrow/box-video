@@ -55,8 +55,8 @@ func MakeEight() {
 	black := color.RGBA{R: 0, G: 0, B: 0, A: 0xff}
 	MakeDotGoing(dc, x, y, x+200, y+400, true, gold)
 	MakeDotGoing(dc, x+200, y+400, x, y, false, red)
-	MakeDotGoing(dc, x, y, x-200, y+400, false, white)
-	MakeDotGoing(dc, x-200, y+400, x, y, true, black)
+	MakeDotGoing(dc, x, y, x-200, y+400, true, white)
+	MakeDotGoing(dc, x-200, y+400, x, y, false, black)
 
 	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
 	ffmpeg("9")
@@ -98,7 +98,11 @@ type EightPainter struct {
 */
 func (ep *EightPainter) Paint(ss []raster.Span, done bool) {
 	for _, s := range ss {
-		ep.TheYs[s.Y] = append(ep.TheYs[s.Y], s.X0, s.X1)
+		//ep.TheYs[s.Y] = append(ep.TheYs[s.Y], s.X0, s.X1)
+		np := gg.Point{float64(s.X0), float64(s.Y)}
+		ep.Points = append(ep.Points, np)
+		np = gg.Point{float64(s.X1), float64(s.Y)}
+		ep.Points = append(ep.Points, np)
 	}
 }
 
@@ -140,31 +144,6 @@ func (ep *EightPainter) DedupAndSortYs() {
 	ep.AllYs = dedupAndSort(ys)
 }
 
-func (ep *EightPainter) OldPaint(ss []raster.Span, done bool) {
-	lasty := ss[0].Y
-	last := ss[0]
-	for _, s := range ss {
-		if s.Y != lasty {
-			//fmt.Println(last.X1, last.Y, done)
-			np := gg.Point{float64(last.X1), float64(last.Y)}
-			if ep.AppendAtEnd {
-				ep.Points = append(ep.Points, np)
-			} else {
-				ep.Points = append([]gg.Point{np}, ep.Points...)
-			}
-		}
-		lasty = s.Y
-		last = s
-	}
-	//fmt.Println(last.X0, last.Y, done)
-	np := gg.Point{float64(last.X1), float64(last.Y)}
-	if ep.AppendAtEnd {
-		ep.Points = append(ep.Points, np)
-	} else {
-		ep.Points = append([]gg.Point{np}, ep.Points...)
-	}
-}
-
 func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64,
 	appendAtEnd bool, color color.RGBA) {
 
@@ -184,27 +163,24 @@ func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64,
 	r := raster.NewRasterizer(1920, 1080)
 	r.UseNonZeroWinding = true
 	r.Clear()
-	r.AddStroke(p, fix(24), raster.RoundCapper, raster.RoundJoiner)
+	r.AddStroke(p, fix(0.1), raster.SquareCapper, raster.RoundJoiner)
 	r.Rasterize(ep)
-	ep.DedupAndSortYs()
-	fmt.Println(len(ep.AllXs))
-	fmt.Println(len(ep.AllYs))
 
 	if appendAtEnd {
-		for i := 0; i < len(ep.AllXs); i++ {
-			if i%20 != 0 {
+		for i := 0; i < len(ep.Points); i++ {
+			if i%40 != 0 {
 				continue
 			}
-			x := ep.AllXs[i]
-			renderEightFrame(dc, float64(x), ep.FindSmallYForX(x), color)
+			p := ep.Points[i]
+			renderEightFrame(dc, p.X, p.Y, color)
 		}
 	} else {
-		for i := len(ep.AllXs) - 1; i > 0; i-- {
-			if i%20 != 0 {
+		for i := len(ep.Points) - 1; i > 0; i-- {
+			if i%40 != 0 {
 				continue
 			}
-			x := ep.AllXs[i]
-			renderEightFrame(dc, float64(x), ep.FindSmallYForX(x), color)
+			p := ep.Points[i]
+			renderEightFrame(dc, p.X, p.Y, color)
 		}
 	}
 }
@@ -272,4 +248,29 @@ func LineTo(x, y float64) {
 			dc.fillPath.Add1(p.Fixed())
 			dc.current = p
 		}*/
+}
+
+func (ep *EightPainter) OldPaint(ss []raster.Span, done bool) {
+	lasty := ss[0].Y
+	last := ss[0]
+	for _, s := range ss {
+		if s.Y != lasty {
+			//fmt.Println(last.X1, last.Y, done)
+			np := gg.Point{float64(last.X1), float64(last.Y)}
+			if ep.AppendAtEnd {
+				ep.Points = append(ep.Points, np)
+			} else {
+				ep.Points = append([]gg.Point{np}, ep.Points...)
+			}
+		}
+		lasty = s.Y
+		last = s
+	}
+	//fmt.Println(last.X0, last.Y, done)
+	np := gg.Point{float64(last.X1), float64(last.Y)}
+	if ep.AppendAtEnd {
+		ep.Points = append(ep.Points, np)
+	} else {
+		ep.Points = append([]gg.Point{np}, ep.Points...)
+	}
 }

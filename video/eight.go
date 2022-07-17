@@ -13,22 +13,28 @@ import (
 func MakeEight() {
 	RmRfBang()
 
-	x := 1300.0
+	x := 400.0
 	y := 400.0
+	MakeArcDotGoing(x, y, 200, 0, 2.3)
+
+	x = 1300.0
+	y = 400.0
 	//gold := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
 	//red := color.RGBA{R: 255, G: 0, B: 0, A: 0xff}
-	white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
+	//white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
 	//black := color.RGBA{R: 0, G: 0, B: 0, A: 0xff}
 
-	MakeDotGoing(x, y, x+200, y+400, true, white, false)
-	MakeDotGoing(x+200, y+400, x, y, false, white, true)
-	MakeDotGoing(x, y, x-200, y+400, true, white, true)
-	MakeDotGoing(x-200, y+400, x, y, false, white, false)
+	/*
+		MakeDotGoing(x, y, x+200, y+400, true, white, false)
+		MakeDotGoing(x+200, y+400, x, y, false, white, true)
+		MakeDotGoing(x, y, x-200, y+400, true, white, true)
+		MakeDotGoing(x-200, y+400, x, y, false, white, false)
 
-	MakeDotGoing(x, y, x+200, y+400, true, white, false)
-	MakeDotGoing(x+200, y+400, x, y, false, white, true)
-	MakeDotGoing(x, y, x-200, y+400, true, white, true)
-	MakeDotGoing(x-200, y+400, x, y, false, white, false)
+		MakeDotGoing(x, y, x+200, y+400, true, white, false)
+		MakeDotGoing(x+200, y+400, x, y, false, white, true)
+		MakeDotGoing(x, y, x-200, y+400, true, white, true)
+		MakeDotGoing(x-200, y+400, x, y, false, white, false)
+	*/
 
 	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
 	ffmpeg("9")
@@ -101,6 +107,9 @@ func EightContext(dotx, doty float64, upsideDown bool) *gg.Context {
 	dc.DrawString(six, x+200, y+460)
 
 	return dc
+}
+
+func MakeArcDotGoing(x1, y1, r, angle1, angle2 float64) {
 }
 
 func MakeDotGoing(x1, y1, x2, y2 float64,

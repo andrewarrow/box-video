@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image/color"
 	"math"
+	"sort"
 
 	"github.com/fogleman/gg"
 	"github.com/golang/freetype/raster"
@@ -79,6 +80,8 @@ type EightPainter struct {
 	AppendAtEnd     bool
 	TheYs           map[int][]int
 	TheYsUniqSorted map[int][]int
+	AllXs           []int
+	AllYs           []int
 }
 
 /*
@@ -95,18 +98,30 @@ func (ep *EightPainter) Paint(ss []raster.Span, done bool) {
 		ep.TheYs[s.Y] = append(ep.TheYs[s.Y], s.X0, s.X1)
 	}
 }
-func (ep *EightPainter) DedupAndSortYs() {
-	for k, v := range ep.TheYs {
-		m := map[int]bool{}
-		for _, vv := range v {
-			m[vv] = true
-		}
-		list := []int{}
-		for kk, _ := range m {
-			list = append(list, kk)
-		}
-		ep.TheYsUniqSorted[k] = list
+
+func dedupAndSort(v []int) []int {
+	m := map[int]bool{}
+	for _, vv := range v {
+		m[vv] = true
 	}
+	list := []int{}
+	for kk, _ := range m {
+		list = append(list, kk)
+	}
+	sort.Ints(list)
+	return list
+}
+
+func (ep *EightPainter) DedupAndSortYs() {
+	xs := []int{}
+	ys := []int{}
+	for k, v := range ep.TheYs {
+		ep.TheYsUniqSorted[k] = dedupAndSort(v)
+		xs = append(xs, v...)
+		ys = append(ys, k)
+	}
+	ep.AllXs = dedupAndSort(xs)
+	ep.AllYs = dedupAndSort(ys)
 }
 
 func (ep *EightPainter) OldPaint(ss []raster.Span, done bool) {
@@ -155,16 +170,14 @@ func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64,
 	r.AddStroke(p, fix(24), raster.RoundCapper, raster.RoundJoiner)
 	r.Rasterize(ep)
 	ep.DedupAndSortYs()
-	fmt.Println(ep.TheYsUniqSorted)
+	fmt.Println(len(ep.AllXs))
+	fmt.Println(len(ep.AllYs))
 
 	var c *gg.Context
-	for i, p := range ep.Points {
-		if i%30 != 0 {
-			continue
-		}
+	for i, x := range ep.AllXs {
 		fmt.Println(frameCount)
 		c = gg.NewContextForImage(dc.Image())
-		ColorDot(c, p.X, p.Y, color)
+		ColorDot(c, float64(x), float64(ep.AllYs[i]), color)
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
 	}

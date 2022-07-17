@@ -19,16 +19,22 @@ func MakeEight() {
 	//red := color.RGBA{R: 255, G: 0, B: 0, A: 0xff}
 	white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
 	//black := color.RGBA{R: 0, G: 0, B: 0, A: 0xff}
-	MakeDotGoing(x, y, x+200, y+400, true, white)
-	//MakeDotGoing(dc, x+200, y+400, x, y, false, white)
-	//MakeDotGoing(dc, x, y, x-200, y+400, true, white)
-	//MakeDotGoing(dc, x-200, y+400, x, y, false, white)
+
+	MakeDotGoing(x, y, x+200, y+400, true, white, false)
+	MakeDotGoing(x+200, y+400, x, y, false, white, true)
+	MakeDotGoing(x, y, x-200, y+400, true, white, true)
+	MakeDotGoing(x-200, y+400, x, y, false, white, false)
+
+	MakeDotGoing(x, y, x+200, y+400, true, white, false)
+	MakeDotGoing(x+200, y+400, x, y, false, white, true)
+	MakeDotGoing(x, y, x-200, y+400, true, white, true)
+	MakeDotGoing(x-200, y+400, x, y, false, white, false)
 
 	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
 	ffmpeg("9")
 }
 
-func EightContext(dotx, doty float64) *gg.Context {
+func EightContext(dotx, doty float64, upsideDown bool) *gg.Context {
 	dc := gg.NewContext(1920, 1080)
 	dc.SetRGB(0, 200, 200)
 	dc.Clear()
@@ -59,19 +65,27 @@ func EightContext(dotx, doty float64) *gg.Context {
 
 	dc.SetRGB(40, 0, 255)
 
-	ColorDot(dc, dotx, doty)
-
-	dc.DrawLine(x, y, x+200, y+400)
-	dc.Stroke()
-	dc.SetRGB(0, 40, 255)
-	dc.DrawLine(x, y, x-200, y+400)
-	dc.Stroke()
+	if upsideDown {
+		ColorDot(dc, dotx, doty)
+		dc.DrawLine(x, y, x+200, y+400)
+		dc.Stroke()
+		dc.SetRGB(0, 40, 255)
+		dc.DrawLine(x, y, x-200, y+400)
+		dc.Stroke()
+	} else {
+		dc.DrawLine(x, y, x+200, y+400)
+		dc.Stroke()
+		dc.SetRGB(0, 40, 255)
+		dc.DrawLine(x, y, x-200, y+400)
+		dc.Stroke()
+		ColorDot(dc, dotx, doty)
+	}
 
 	return dc
 }
 
 func MakeDotGoing(x1, y1, x2, y2 float64,
-	appendAtEnd bool, color color.RGBA) {
+	appendAtEnd bool, color color.RGBA, upsideDown bool) {
 
 	var p raster.Path
 	p.Start(Fixed(x1, y1))
@@ -95,7 +109,7 @@ func MakeDotGoing(x1, y1, x2, y2 float64,
 				continue
 			}
 			p := ep.Points[i]
-			renderEightFrame(p.X, p.Y, color)
+			renderEightFrame(p.X, p.Y, color, upsideDown)
 		}
 	} else {
 		for i := len(ep.Points) - 1; i > 0; i-- {
@@ -103,15 +117,15 @@ func MakeDotGoing(x1, y1, x2, y2 float64,
 				continue
 			}
 			p := ep.Points[i]
-			renderEightFrame(p.X, p.Y, color)
+			renderEightFrame(p.X, p.Y, color, upsideDown)
 		}
 	}
 }
 
-func renderEightFrame(x, y float64, color color.RGBA) {
+func renderEightFrame(x, y float64, color color.RGBA, upsideDown bool) {
 	var c *gg.Context
 	fmt.Println(frameCount)
-	c = EightContext(x, y)
+	c = EightContext(x, y, upsideDown)
 	c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 	frameCount++
 }

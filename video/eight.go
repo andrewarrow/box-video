@@ -14,9 +14,16 @@ import (
 type EightData struct {
 	P          gg.Point
 	UpsideDown bool
+	Side       string
 }
 
 var eightChannel chan EightData = make(chan EightData, 1)
+var upsideDownLeft bool
+var upsideDownRight bool
+var leftDotx float64
+var leftDoty float64
+var rightDotx float64
+var rightDoty float64
 
 func EightLoop(upsides ...bool) {
 	x := 746.0
@@ -33,7 +40,7 @@ func EightLoop(upsides ...bool) {
 
 func ReadEightChannelData() {
 	for thing := range eightChannel {
-		renderEightFrame(thing.P.X, thing.P.Y, thing.UpsideDown)
+		renderEightFrame(thing)
 	}
 }
 
@@ -41,40 +48,44 @@ func MakeEight() {
 	RmRfBang()
 
 	go ReadEightChannelData()
-	EightLoop(false, false, false, false)
-	EightLoop(true, true, true, true)
 
-	//x := 1300.0
-	//y := 400.0
+	go func() {
+		EightLoop(false, false, false, false)
+		EightLoop(true, true, true, true)
+	}()
+
+	x := 1300.0
+	y := 400.0
 	//gold := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
 	//red := color.RGBA{R: 255, G: 0, B: 0, A: 0xff}
 	//white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
 	//black := color.RGBA{R: 0, G: 0, B: 0, A: 0xff}
 
-	/*
-		MakeDotGoing(x, y, x+200, y+400, true, white, false)
-		MakeDotGoing(x+200, y+400, x, y, false, white, true)
-		MakeDotGoing(x, y, x-200, y+400, true, white, true)
-		MakeDotGoing(x-200, y+400, x, y, false, white, false)
+	MakeDotGoing(x, y, x+200, y+400, true, false)
+	MakeDotGoing(x+200, y+400, x, y, false, true)
+	MakeDotGoing(x, y, x-200, y+400, true, true)
+	MakeDotGoing(x-200, y+400, x, y, false, false)
 
-		MakeDotGoing(x, y, x+200, y+400, true, white, false)
-		MakeDotGoing(x+200, y+400, x, y, false, white, true)
-		MakeDotGoing(x, y, x-200, y+400, true, white, true)
-		MakeDotGoing(x-200, y+400, x, y, false, white, false)
-	*/
+	MakeDotGoing(x, y, x+200, y+400, true, false)
+	MakeDotGoing(x+200, y+400, x, y, false, true)
+	MakeDotGoing(x, y, x-200, y+400, true, true)
+	MakeDotGoing(x-200, y+400, x, y, false, false)
 
 	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
 	ffmpeg("9")
 }
 
-func EightContext(dotx, doty float64, upsideDown bool) *gg.Context {
+func EightContext() *gg.Context {
 	dc := gg.NewContext(1920, 1080)
 	dc.SetRGB(0, 200, 200)
 	dc.Clear()
 	dc.SetLineWidth(6)
 
-	if upsideDown {
-		ColorDot(dc, dotx, doty)
+	if upsideDownLeft {
+		ColorDot(dc, leftDotx, leftDoty)
+	}
+	if upsideDownRight {
+		ColorDot(dc, rightDotx, rightDoty)
 	}
 
 	x := 400.0
@@ -108,25 +119,28 @@ func EightContext(dotx, doty float64, upsideDown bool) *gg.Context {
 	dc.DrawLine(x, y, x-200, y+400)
 	dc.Stroke()
 
-	if !upsideDown {
-		ColorDot(dc, dotx, doty)
+	if !upsideDownLeft {
+		ColorDot(dc, leftDotx, leftDoty)
+	}
+	if !upsideDownRight {
+		ColorDot(dc, rightDotx, rightDoty)
 	}
 
 	dc.SetRGB(255, 255, 255)
 	dc.LoadFontFace("arialbd.ttf", 96)
 	nine := "+9"
-	if upsideDown {
+	if upsideDownRight {
 		nine = "-9"
 	}
 	dc.DrawString(nine, x-60, y-40)
 	dc.LoadFontFace("arialbd.ttf", 36)
 	three := "+3"
-	if upsideDown {
+	if upsideDownRight {
 		three = "-3"
 	}
 	dc.DrawString(three, x-240, y+460)
 	six := "+6"
-	if upsideDown {
+	if upsideDownRight {
 		six = "-6"
 	}
 	dc.DrawString(six, x+200, y+460)
@@ -175,12 +189,12 @@ func MakeArcDotGoing(upsideDown bool, x, y, r, angle1, angle2 float64, sortBool 
 			continue
 		}
 		p := ep.Points[i]
-		eightChannel <- EightData{p, upsideDown}
+		eightChannel <- EightData{p, upsideDown, "left"}
 	}
 }
 
 func MakeDotGoing(x1, y1, x2, y2 float64,
-	appendAtEnd bool, color color.RGBA, upsideDown bool) {
+	appendAtEnd bool, upsideDown bool) {
 
 	var p raster.Path
 	p.Start(Fixed(x1, y1))
@@ -204,7 +218,7 @@ func MakeDotGoing(x1, y1, x2, y2 float64,
 				continue
 			}
 			p := ep.Points[i]
-			eightChannel <- EightData{p, upsideDown}
+			eightChannel <- EightData{p, upsideDown, "right"}
 		}
 	} else {
 		for i := len(ep.Points) - 1; i > 0; i-- {
@@ -212,15 +226,24 @@ func MakeDotGoing(x1, y1, x2, y2 float64,
 				continue
 			}
 			p := ep.Points[i]
-			eightChannel <- EightData{p, upsideDown}
+			eightChannel <- EightData{p, upsideDown, "right"}
 		}
 	}
 }
 
-func renderEightFrame(x, y float64, upsideDown bool) {
+func renderEightFrame(ed EightData) {
 	var c *gg.Context
 	fmt.Println(frameCount)
-	c = EightContext(x, y, upsideDown)
+	if ed.Side == "left" {
+		upsideDownLeft = ed.UpsideDown
+		leftDotx = ed.P.X
+		leftDoty = ed.P.Y
+	} else {
+		upsideDownRight = ed.UpsideDown
+		rightDotx = ed.P.X
+		rightDoty = ed.P.Y
+	}
+	c = EightContext()
 	c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 	frameCount++
 }

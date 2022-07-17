@@ -87,7 +87,7 @@ func MakeEight() {
 
 	time.Sleep(time.Second * 120)
 	done = true
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Second * 100)
 	ffmpeg("36")
 }
 

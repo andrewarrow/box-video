@@ -49,12 +49,12 @@ func MakeEight() {
 	dc.DrawLine(x, y, x-200, y+400)
 	dc.Stroke()
 
-	//gold := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
+	gold := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
 	white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
-	//MakeDotGoing(dc, x, y, x+200, y+400, true, gold)
-	//MakeDotGoing(dc, x+200, y+400, x, y, false, gold)
+	MakeDotGoing(dc, x, y, x+200, y+400, true, gold)
+	MakeDotGoing(dc, x+200, y+400, x, y, false, gold)
 	MakeDotGoing(dc, x, y, x-200, y+400, true, white)
-	//MakeDotGoing(dc, x-200, y+400, x, y, false, gold)
+	MakeDotGoing(dc, x-200, y+400, x, y, false, gold)
 
 	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
 	ffmpeg("9")
@@ -188,14 +188,26 @@ func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64,
 	fmt.Println(len(ep.AllXs))
 	fmt.Println(len(ep.AllYs))
 
-	var c *gg.Context
-	for _, x := range ep.AllXs {
-		fmt.Println(frameCount)
-		c = gg.NewContextForImage(dc.Image())
-		ColorDot(c, float64(x), ep.FindSmallYForX(x), color)
-		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
-		frameCount++
+	if appendAtEnd {
+		for i := 0; i < len(ep.AllXs); i++ {
+			x := ep.AllXs[i]
+			renderEightFrame(dc, float64(x), ep.FindSmallYForX(x), color)
+		}
+	} else {
+		for i := len(ep.AllXs) - 1; i > 0; i-- {
+			x := ep.AllXs[i]
+			renderEightFrame(dc, float64(x), ep.FindSmallYForX(x), color)
+		}
 	}
+}
+
+func renderEightFrame(dc *gg.Context, x, y float64, color color.RGBA) {
+	var c *gg.Context
+	fmt.Println(frameCount)
+	c = gg.NewContextForImage(dc.Image())
+	ColorDot(c, x, y, color)
+	c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
+	frameCount++
 }
 
 func ArcWithDot(dc *gg.Context, x, y, r, angle1, angle2 float64) {

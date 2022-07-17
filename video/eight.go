@@ -16,14 +16,25 @@ func MakeEight() {
 
 	x := 746.0
 	y := 246.0
-	MakeArcDotGoing(60+x, 140+y, -200, 0, 2.3, true)
+	MakeArcDotGoing(false, 60+x, 140+y, -200, 0, 2.3, true)
 	x = 400.0
 	y = 400.0
-	MakeArcDotGoing(x, y, 200, 0, 2.3, true)
-	MakeArcDotGoing(60+x, 140+y, -200, 0, 2.3, false)
+	MakeArcDotGoing(true, x, y, 200, 0, 2.3, true)
+	MakeArcDotGoing(true, 60+x, 140+y, -200, 0, 2.3, false)
 	x = 746.0
 	y = 246.0
-	MakeArcDotGoing(x, y, 200, 0, 2.3, false)
+	MakeArcDotGoing(false, x, y, 200, 0, 2.3, false)
+
+	x = 746.0
+	y = 246.0
+	MakeArcDotGoing(false, 60+x, 140+y, -200, 0, 2.3, true)
+	x = 400.0
+	y = 400.0
+	MakeArcDotGoing(true, x, y, 200, 0, 2.3, true)
+	MakeArcDotGoing(true, 60+x, 140+y, -200, 0, 2.3, false)
+	x = 746.0
+	y = 246.0
+	MakeArcDotGoing(false, x, y, 200, 0, 2.3, false)
 
 	x = 1300.0
 	y = 400.0
@@ -54,6 +65,10 @@ func EightContext(dotx, doty float64, upsideDown bool) *gg.Context {
 	dc.Clear()
 	dc.SetLineWidth(6)
 
+	if upsideDown {
+		ColorDot(dc, dotx, doty)
+	}
+
 	x := 400.0
 	y := 400.0
 
@@ -79,19 +94,13 @@ func EightContext(dotx, doty float64, upsideDown bool) *gg.Context {
 
 	dc.SetRGB(40, 0, 255)
 
-	if upsideDown {
-		ColorDot(dc, dotx, doty)
-		dc.DrawLine(x, y, x+200, y+400)
-		dc.Stroke()
-		dc.SetRGB(0, 40, 255)
-		dc.DrawLine(x, y, x-200, y+400)
-		dc.Stroke()
-	} else {
-		dc.DrawLine(x, y, x+200, y+400)
-		dc.Stroke()
-		dc.SetRGB(0, 40, 255)
-		dc.DrawLine(x, y, x-200, y+400)
-		dc.Stroke()
+	dc.DrawLine(x, y, x+200, y+400)
+	dc.Stroke()
+	dc.SetRGB(0, 40, 255)
+	dc.DrawLine(x, y, x-200, y+400)
+	dc.Stroke()
+
+	if !upsideDown {
 		ColorDot(dc, dotx, doty)
 	}
 
@@ -117,7 +126,7 @@ func EightContext(dotx, doty float64, upsideDown bool) *gg.Context {
 	return dc
 }
 
-func MakeArcDotGoing(x, y, r, angle1, angle2 float64, sortBool bool) {
+func MakeArcDotGoing(upsideDown bool, x, y, r, angle1, angle2 float64, sortBool bool) {
 	var p raster.Path
 	p.Start(Fixed(x, y))
 	fmt.Println(p)
@@ -154,11 +163,11 @@ func MakeArcDotGoing(x, y, r, angle1, angle2 float64, sortBool bool) {
 	ep.SortPoints(sortBool)
 	fmt.Println(ep.Points)
 	for i := 0; i < len(ep.Points); i++ {
-		if i%40 != 0 {
+		if i%60 != 0 {
 			continue
 		}
 		p := ep.Points[i]
-		renderEightFrame(p.X, p.Y, false)
+		renderEightFrame(p.X, p.Y, upsideDown)
 	}
 }
 

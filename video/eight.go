@@ -83,11 +83,22 @@ func EightContext(dotx, doty float64, upsideDown bool) *gg.Context {
 
 	dc.SetRGB(255, 255, 255)
 	dc.LoadFontFace("arialbd.ttf", 96)
-	nine := "9"
+	nine := "+9"
 	if upsideDown {
 		nine = "-9"
 	}
-	dc.DrawString(nine, x, y-40)
+	dc.DrawString(nine, x-60, y-40)
+	dc.LoadFontFace("arialbd.ttf", 36)
+	three := "+3"
+	if upsideDown {
+		three = "-3"
+	}
+	dc.DrawString(three, x-240, y+460)
+	six := "+6"
+	if upsideDown {
+		six = "-6"
+	}
+	dc.DrawString(six, x+200, y+460)
 
 	return dc
 }

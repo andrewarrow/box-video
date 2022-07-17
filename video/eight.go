@@ -11,33 +11,29 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
+func EightLoop(upsides ...bool) {
+	x := 746.0
+	y := 246.0
+	MakeArcDotGoing(upsides[0], 60+x, 140+y, -200, 0, 2.3, true)
+	x = 400.0
+	y = 400.0
+	MakeArcDotGoing(upsides[1], x, y, 200, 0, 2.3, true)
+	MakeArcDotGoing(upsides[2], 60+x, 140+y, -200, 0, 2.3, false)
+	x = 746.0
+	y = 246.0
+	MakeArcDotGoing(upsides[3], x, y, 200, 0, 2.3, false)
+}
+
 func MakeEight() {
 	RmRfBang()
 
-	x := 746.0
-	y := 246.0
-	MakeArcDotGoing(false, 60+x, 140+y, -200, 0, 2.3, true)
-	x = 400.0
-	y = 400.0
-	MakeArcDotGoing(true, x, y, 200, 0, 2.3, true)
-	MakeArcDotGoing(true, 60+x, 140+y, -200, 0, 2.3, false)
-	x = 746.0
-	y = 246.0
-	MakeArcDotGoing(false, x, y, 200, 0, 2.3, false)
+	//EightLoop(true, true, true, false)
+	//EightLoop(false, false, false, true)
+	EightLoop(false, false, false, true)
+	EightLoop(true, true, true, false)
 
-	x = 746.0
-	y = 246.0
-	MakeArcDotGoing(false, 60+x, 140+y, -200, 0, 2.3, true)
-	x = 400.0
-	y = 400.0
-	MakeArcDotGoing(true, x, y, 200, 0, 2.3, true)
-	MakeArcDotGoing(true, 60+x, 140+y, -200, 0, 2.3, false)
-	x = 746.0
-	y = 246.0
-	MakeArcDotGoing(false, x, y, 200, 0, 2.3, false)
-
-	x = 1300.0
-	y = 400.0
+	//x := 1300.0
+	//y := 400.0
 	//gold := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
 	//red := color.RGBA{R: 255, G: 0, B: 0, A: 0xff}
 	//white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}

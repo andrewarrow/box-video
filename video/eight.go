@@ -5,7 +5,6 @@ import (
 	"image/color"
 	"math"
 	"sort"
-	"time"
 
 	"github.com/fogleman/gg"
 	"github.com/golang/freetype/raster"
@@ -52,7 +51,7 @@ func MakeEight() {
 
 	go func() {
 		EightLoop(false, false, false, false)
-		//EightLoop(true, true, true, true)
+		EightLoop(true, true, true, true)
 	}()
 
 	x := 1300.0
@@ -62,7 +61,7 @@ func MakeEight() {
 	//white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
 	//black := color.RGBA{R: 0, G: 0, B: 0, A: 0xff}
 
-	if false {
+	if true {
 		MakeDotGoing(x, y, x+200, y+400, true, false)
 		MakeDotGoing(x+200, y+400, x, y, false, true)
 		MakeDotGoing(x, y, x-200, y+400, true, true)
@@ -74,9 +73,7 @@ func MakeEight() {
 		MakeDotGoing(x-200, y+400, x, y, false, false)
 	}
 
-	time.Sleep(time.Second * 2)
-
-	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
+	//time.Sleep(time.Second * 2)
 	ffmpeg("36")
 }
 
@@ -99,12 +96,36 @@ func EightContext() *gg.Context {
 	dc.SetRGB(255, 255, 255)
 	dc.LoadFontFace("arial.ttf", 26)
 	dc.DrawString("0", x+210, y+40)
-	dc.DrawString("1", x+410, y+80)
-	dc.DrawString("2", x+560, y-40)
-	dc.DrawString("4", x+460, y-240)
-	dc.DrawString("8", x-60, y+240)
-	dc.DrawString("5", x+60, y-90)
-	dc.DrawString("7", x-160, y+40)
+	one := "+1"
+	if upsideDownLeft {
+		one = "-1"
+	}
+	two := "+2"
+	if upsideDownLeft {
+		two = "-1"
+	}
+	four := "+4"
+	if upsideDownLeft {
+		four = "-4"
+	}
+	eight := "+8"
+	if upsideDownLeft {
+		eight = "-8"
+	}
+	five := "+5"
+	if upsideDownLeft {
+		five = "-5"
+	}
+	seven := "+7"
+	if upsideDownLeft {
+		seven = "-7"
+	}
+	dc.DrawString(one, x+410, y+80)
+	dc.DrawString(two, x+560, y-40)
+	dc.DrawString(four, x+460, y-240)
+	dc.DrawString(eight, x-60, y+240)
+	dc.DrawString(five, x+60, y-90)
+	dc.DrawString(seven, x-160, y+40)
 
 	dc.SetRGB(0, 40, 255)
 	dc.DrawArc(x, y, 200, 0, 2.3)

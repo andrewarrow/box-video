@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image/color"
 	"math"
-	"sort"
 
 	"github.com/fogleman/gg"
 	"github.com/golang/freetype/raster"
@@ -78,70 +77,17 @@ func ColorDot(dc *gg.Context, x, y float64, c color.RGBA) {
 }
 
 type EightPainter struct {
-	Points          []gg.Point
-	AppendAtEnd     bool
-	TheYs           map[int][]int
-	TheYsUniqSorted map[int][]int
-	AllXs           []int
-	AllYs           []int
-	YforX           map[int]int
+	Points      []gg.Point
+	AppendAtEnd bool
 }
 
-/*
-{799 1089 1113 65535}
-{799 1113 1114 41994}
-{800 1088 1089 62879}
-{800 1089 1112 65535}
-{800 1112 1113 64767}
-{800 1113 1114 10002}
-{801 1088 1089 57358}
-*/
 func (ep *EightPainter) Paint(ss []raster.Span, done bool) {
 	for _, s := range ss {
-		//ep.TheYs[s.Y] = append(ep.TheYs[s.Y], s.X0, s.X1)
 		np := gg.Point{float64(s.X0), float64(s.Y)}
 		ep.Points = append(ep.Points, np)
 		np = gg.Point{float64(s.X1), float64(s.Y)}
 		ep.Points = append(ep.Points, np)
 	}
-}
-
-func dedupAndSort(v []int) []int {
-	m := map[int]bool{}
-	for _, vv := range v {
-		m[vv] = true
-	}
-	list := []int{}
-	for kk, _ := range m {
-		list = append(list, kk)
-	}
-	sort.Ints(list)
-	return list
-}
-
-func (ep *EightPainter) FindSmallYForX(x int) float64 {
-	return float64(ep.YforX[x])
-}
-
-// 390: [1300, 1301, 1302]
-// 391: [1300, 1301, 1302]
-// 392: [1301, 1302, 1303]
-
-func (ep *EightPainter) DedupAndSortYs() {
-	xs := []int{}
-	ys := []int{}
-	for k, v := range ep.TheYs {
-		for _, x := range v {
-			if k < ep.YforX[x] || ep.YforX[x] == 0 {
-				ep.YforX[x] = k
-			}
-		}
-		ep.TheYsUniqSorted[k] = dedupAndSort(v)
-		xs = append(xs, v...)
-		ys = append(ys, k)
-	}
-	ep.AllXs = dedupAndSort(xs)
-	ep.AllYs = dedupAndSort(ys)
 }
 
 func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64,
@@ -156,9 +102,6 @@ func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64,
 	ep := &EightPainter{}
 	ep.Points = []gg.Point{}
 	ep.AppendAtEnd = appendAtEnd
-	ep.TheYs = map[int][]int{}
-	ep.TheYsUniqSorted = map[int][]int{}
-	ep.YforX = map[int]int{}
 
 	r := raster.NewRasterizer(1920, 1080)
 	r.UseNonZeroWinding = true
@@ -248,29 +191,4 @@ func LineTo(x, y float64) {
 			dc.fillPath.Add1(p.Fixed())
 			dc.current = p
 		}*/
-}
-
-func (ep *EightPainter) OldPaint(ss []raster.Span, done bool) {
-	lasty := ss[0].Y
-	last := ss[0]
-	for _, s := range ss {
-		if s.Y != lasty {
-			//fmt.Println(last.X1, last.Y, done)
-			np := gg.Point{float64(last.X1), float64(last.Y)}
-			if ep.AppendAtEnd {
-				ep.Points = append(ep.Points, np)
-			} else {
-				ep.Points = append([]gg.Point{np}, ep.Points...)
-			}
-		}
-		lasty = s.Y
-		last = s
-	}
-	//fmt.Println(last.X0, last.Y, done)
-	np := gg.Point{float64(last.X1), float64(last.Y)}
-	if ep.AppendAtEnd {
-		ep.Points = append(ep.Points, np)
-	} else {
-		ep.Points = append([]gg.Point{np}, ep.Points...)
-	}
 }

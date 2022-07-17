@@ -12,6 +12,23 @@ import (
 
 func MakeEight() {
 	RmRfBang()
+
+	x := 1300.0
+	y := 400.0
+	//gold := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
+	//red := color.RGBA{R: 255, G: 0, B: 0, A: 0xff}
+	white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
+	//black := color.RGBA{R: 0, G: 0, B: 0, A: 0xff}
+	MakeDotGoing(x, y, x+200, y+400, true, white)
+	//MakeDotGoing(dc, x+200, y+400, x, y, false, white)
+	//MakeDotGoing(dc, x, y, x-200, y+400, true, white)
+	//MakeDotGoing(dc, x-200, y+400, x, y, false, white)
+
+	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
+	ffmpeg("9")
+}
+
+func EightContext(dotx, doty float64) *gg.Context {
 	dc := gg.NewContext(1920, 1080)
 	dc.SetRGB(0, 200, 200)
 	dc.Clear()
@@ -42,55 +59,18 @@ func MakeEight() {
 
 	dc.SetRGB(40, 0, 255)
 
+	ColorDot(dc, dotx, doty)
+
 	dc.DrawLine(x, y, x+200, y+400)
 	dc.Stroke()
 	dc.SetRGB(0, 40, 255)
 	dc.DrawLine(x, y, x-200, y+400)
 	dc.Stroke()
 
-	gold := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
-	red := color.RGBA{R: 255, G: 0, B: 0, A: 0xff}
-	white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
-	black := color.RGBA{R: 0, G: 0, B: 0, A: 0xff}
-	MakeDotGoing(dc, x, y, x+200, y+400, true, gold)
-	MakeDotGoing(dc, x+200, y+400, x, y, false, red)
-	MakeDotGoing(dc, x, y, x-200, y+400, true, white)
-	MakeDotGoing(dc, x-200, y+400, x, y, false, black)
-
-	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
-	ffmpeg("9")
+	return dc
 }
 
-func Fixed(x, y float64) fixed.Point26_6 {
-	return fixed.Point26_6{fix(x), fix(y)}
-}
-
-func fix(x float64) fixed.Int26_6 {
-	return fixed.Int26_6(math.Round(x * 64))
-}
-
-func ColorDot(dc *gg.Context, x, y float64, c color.RGBA) {
-	pattern := gg.NewSolidPattern(c)
-	dc.SetFillStyle(pattern)
-	dc.DrawCircle(x, y, 24)
-	dc.Fill()
-}
-
-type EightPainter struct {
-	Points      []gg.Point
-	AppendAtEnd bool
-}
-
-func (ep *EightPainter) Paint(ss []raster.Span, done bool) {
-	for _, s := range ss {
-		np := gg.Point{float64(s.X0), float64(s.Y)}
-		ep.Points = append(ep.Points, np)
-		np = gg.Point{float64(s.X1), float64(s.Y)}
-		ep.Points = append(ep.Points, np)
-	}
-}
-
-func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64,
+func MakeDotGoing(x1, y1, x2, y2 float64,
 	appendAtEnd bool, color color.RGBA) {
 
 	var p raster.Path
@@ -115,7 +95,7 @@ func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64,
 				continue
 			}
 			p := ep.Points[i]
-			renderEightFrame(dc, p.X, p.Y, color)
+			renderEightFrame(p.X, p.Y, color)
 		}
 	} else {
 		for i := len(ep.Points) - 1; i > 0; i-- {
@@ -123,18 +103,47 @@ func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64,
 				continue
 			}
 			p := ep.Points[i]
-			renderEightFrame(dc, p.X, p.Y, color)
+			renderEightFrame(p.X, p.Y, color)
 		}
 	}
 }
 
-func renderEightFrame(dc *gg.Context, x, y float64, color color.RGBA) {
+func renderEightFrame(x, y float64, color color.RGBA) {
 	var c *gg.Context
 	fmt.Println(frameCount)
-	c = gg.NewContextForImage(dc.Image())
-	ColorDot(c, x, y, color)
+	c = EightContext(x, y)
 	c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 	frameCount++
+}
+
+func Fixed(x, y float64) fixed.Point26_6 {
+	return fixed.Point26_6{fix(x), fix(y)}
+}
+
+func fix(x float64) fixed.Int26_6 {
+	return fixed.Int26_6(math.Round(x * 64))
+}
+
+func ColorDot(dc *gg.Context, x, y float64) {
+	white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
+	pattern := gg.NewSolidPattern(white)
+	dc.SetFillStyle(pattern)
+	dc.DrawCircle(x, y, 24)
+	dc.Fill()
+}
+
+type EightPainter struct {
+	Points      []gg.Point
+	AppendAtEnd bool
+}
+
+func (ep *EightPainter) Paint(ss []raster.Span, done bool) {
+	for _, s := range ss {
+		np := gg.Point{float64(s.X0), float64(s.Y)}
+		ep.Points = append(ep.Points, np)
+		np = gg.Point{float64(s.X1), float64(s.Y)}
+		ep.Points = append(ep.Points, np)
+	}
 }
 
 func ArcWithDot(dc *gg.Context, x, y, r, angle1, angle2 float64) {

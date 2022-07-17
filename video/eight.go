@@ -50,11 +50,13 @@ func MakeEight() {
 	dc.Stroke()
 
 	gold := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
+	red := color.RGBA{R: 255, G: 0, B: 0, A: 0xff}
 	white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
+	black := color.RGBA{R: 0, G: 0, B: 0, A: 0xff}
 	MakeDotGoing(dc, x, y, x+200, y+400, true, gold)
-	MakeDotGoing(dc, x+200, y+400, x, y, false, gold)
-	MakeDotGoing(dc, x, y, x-200, y+400, true, white)
-	MakeDotGoing(dc, x-200, y+400, x, y, false, gold)
+	MakeDotGoing(dc, x+200, y+400, x, y, false, red)
+	MakeDotGoing(dc, x, y, x-200, y+400, false, white)
+	MakeDotGoing(dc, x-200, y+400, x, y, true, black)
 
 	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
 	ffmpeg("9")
@@ -190,11 +192,17 @@ func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64,
 
 	if appendAtEnd {
 		for i := 0; i < len(ep.AllXs); i++ {
+			if i%20 != 0 {
+				continue
+			}
 			x := ep.AllXs[i]
 			renderEightFrame(dc, float64(x), ep.FindSmallYForX(x), color)
 		}
 	} else {
 		for i := len(ep.AllXs) - 1; i > 0; i-- {
+			if i%20 != 0 {
+				continue
+			}
 			x := ep.AllXs[i]
 			renderEightFrame(dc, float64(x), ep.FindSmallYForX(x), color)
 		}

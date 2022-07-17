@@ -48,10 +48,12 @@ func MakeEight() {
 	dc.DrawLine(x, y, x-200, y+400)
 	dc.Stroke()
 
-	MakeDotGoing(dc, x, y, x+200, y+400, true)
-	MakeDotGoing(dc, x+200, y+400, x, y, false)
-	MakeDotGoing(dc, x, y, x-200, y+400, true)
-	MakeDotGoing(dc, x-200, y+400, x, y, false)
+	//gold := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
+	white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
+	//MakeDotGoing(dc, x, y, x+200, y+400, true, gold)
+	//MakeDotGoing(dc, x+200, y+400, x, y, false, gold)
+	MakeDotGoing(dc, x, y, x-200, y+400, true, white)
+	//MakeDotGoing(dc, x-200, y+400, x, y, false, gold)
 
 	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
 	ffmpeg("9")
@@ -73,17 +75,47 @@ func ColorDot(dc *gg.Context, x, y float64, c color.RGBA) {
 }
 
 type EightPainter struct {
-	Points      []gg.Point
-	AppendAtEnd bool
+	Points          []gg.Point
+	AppendAtEnd     bool
+	TheYs           map[int][]int
+	TheYsUniqSorted map[int][]int
 }
 
+/*
+{799 1089 1113 65535}
+{799 1113 1114 41994}
+{800 1088 1089 62879}
+{800 1089 1112 65535}
+{800 1112 1113 64767}
+{800 1113 1114 10002}
+{801 1088 1089 57358}
+*/
 func (ep *EightPainter) Paint(ss []raster.Span, done bool) {
+	for _, s := range ss {
+		ep.TheYs[s.Y] = append(ep.TheYs[s.Y], s.X0, s.X1)
+	}
+}
+func (ep *EightPainter) DedupAndSortYs() {
+	for k, v := range ep.TheYs {
+		m := map[int]bool{}
+		for _, vv := range v {
+			m[vv] = true
+		}
+		list := []int{}
+		for kk, _ := range m {
+			list = append(list, kk)
+		}
+		ep.TheYsUniqSorted[k] = list
+	}
+}
+
+func (ep *EightPainter) OldPaint(ss []raster.Span, done bool) {
 	lasty := ss[0].Y
 	last := ss[0]
 	for _, s := range ss {
 		if s.Y != lasty {
-			//fmt.Println(last.X0, last.Y, done)
-			np := gg.Point{float64(last.X0), float64(last.Y)}
+			//fmt.Println(last.X1, last.Y, done)
+			np := gg.Point{float64(last.X1), float64(last.Y)}
 			if ep.AppendAtEnd {
 				ep.Points = append(ep.Points, np)
 			} else {
@@ -94,7 +126,7 @@ func (ep *EightPainter) Paint(ss []raster.Span, done bool) {
 		last = s
 	}
 	//fmt.Println(last.X0, last.Y, done)
-	np := gg.Point{float64(last.X0), float64(last.Y)}
+	np := gg.Point{float64(last.X1), float64(last.Y)}
 	if ep.AppendAtEnd {
 		ep.Points = append(ep.Points, np)
 	} else {
@@ -102,7 +134,8 @@ func (ep *EightPainter) Paint(ss []raster.Span, done bool) {
 	}
 }
 
-func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64, appendAtEnd bool) {
+func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64,
+	appendAtEnd bool, color color.RGBA) {
 
 	var p raster.Path
 	p.Start(Fixed(x1, y1))
@@ -113,13 +146,16 @@ func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64, appendAtEnd bool) {
 	ep := &EightPainter{}
 	ep.Points = []gg.Point{}
 	ep.AppendAtEnd = appendAtEnd
+	ep.TheYs = map[int][]int{}
+	ep.TheYsUniqSorted = map[int][]int{}
 
 	r := raster.NewRasterizer(1920, 1080)
 	r.UseNonZeroWinding = true
 	r.Clear()
 	r.AddStroke(p, fix(24), raster.RoundCapper, raster.RoundJoiner)
 	r.Rasterize(ep)
-	color := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
+	ep.DedupAndSortYs()
+	fmt.Println(ep.TheYsUniqSorted)
 
 	var c *gg.Context
 	for i, p := range ep.Points {

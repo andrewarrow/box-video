@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image/color"
 	"math"
+	"sort"
 
 	"github.com/fogleman/gg"
 	"github.com/golang/freetype/raster"
@@ -13,9 +14,16 @@ import (
 func MakeEight() {
 	RmRfBang()
 
-	x := 400.0
-	y := 400.0
-	MakeArcDotGoing(x, y, 200, 0, 2.3)
+	x := 746.0
+	y := 246.0
+	MakeArcDotGoing(60+x, 140+y, -200, 0, 2.3, true)
+	x = 400.0
+	y = 400.0
+	MakeArcDotGoing(x, y, 200, 0, 2.3, true)
+	MakeArcDotGoing(60+x, 140+y, -200, 0, 2.3, false)
+	x = 746.0
+	y = 246.0
+	MakeArcDotGoing(x, y, 200, 0, 2.3, false)
 
 	x = 1300.0
 	y = 400.0
@@ -109,7 +117,7 @@ func EightContext(dotx, doty float64, upsideDown bool) *gg.Context {
 	return dc
 }
 
-func MakeArcDotGoing(x, y, r, angle1, angle2 float64) {
+func MakeArcDotGoing(x, y, r, angle1, angle2 float64, sortBool bool) {
 	var p raster.Path
 	p.Start(Fixed(x, y))
 	fmt.Println(p)
@@ -143,6 +151,7 @@ func MakeArcDotGoing(x, y, r, angle1, angle2 float64) {
 	ras.Clear()
 	ras.AddStroke(p, fix(1), raster.SquareCapper, raster.RoundJoiner)
 	ras.Rasterize(ep)
+	ep.SortPoints(sortBool)
 	fmt.Println(ep.Points)
 	for i := 0; i < len(ep.Points); i++ {
 		if i%40 != 0 {
@@ -226,6 +235,17 @@ func (ep *EightPainter) Paint(ss []raster.Span, done bool) {
 		ep.Points = append(ep.Points, np)
 		np = gg.Point{float64(s.X1), float64(s.Y)}
 		ep.Points = append(ep.Points, np)
+	}
+}
+func (ep *EightPainter) SortPoints(b bool) {
+	if b == true {
+		sort.SliceStable(ep.Points, func(i, j int) bool {
+			return ep.Points[i].X > ep.Points[j].X
+		})
+	} else {
+		sort.SliceStable(ep.Points, func(i, j int) bool {
+			return ep.Points[i].X < ep.Points[j].X
+		})
 	}
 }
 

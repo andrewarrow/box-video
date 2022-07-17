@@ -50,10 +50,10 @@ func MakeEight() {
 	dc.DrawLine(x, y, x-200, y+400)
 	dc.Stroke()
 
-	MakeDotGoing(dc, x, y, x+200, y+400, false)
-	MakeDotGoing(dc, x+200, y+400, x, y, true)
-	MakeDotGoing(dc, x, y, x-200, y+400, false)
-	MakeDotGoing(dc, x-200, y+400, x, y, true)
+	MakeDotGoing(dc, x, y, x+200, y+400, true)
+	MakeDotGoing(dc, x+200, y+400, x, y, false)
+	MakeDotGoing(dc, x, y, x-200, y+400, true)
+	MakeDotGoing(dc, x-200, y+400, x, y, false)
 
 	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
 	ffmpeg("9")
@@ -74,7 +74,8 @@ func WhiteDot(dc *gg.Context, x, y float64) {
 }
 
 type EightPainter struct {
-	Points []gg.Point
+	Points      []gg.Point
+	AppendAtEnd bool
 }
 
 func (ep *EightPainter) Paint(ss []raster.Span, done bool) {
@@ -83,16 +84,26 @@ func (ep *EightPainter) Paint(ss []raster.Span, done bool) {
 	for _, s := range ss {
 		if s.Y != lasty {
 			//fmt.Println(last.X0, last.Y, done)
-			ep.Points = append(ep.Points, gg.Point{float64(last.X0), float64(last.Y)})
+			np := gg.Point{float64(last.X0), float64(last.Y)}
+			if ep.AppendAtEnd {
+				ep.Points = append(ep.Points, np)
+			} else {
+				ep.Points = append([]gg.Point{np}, ep.Points...)
+			}
 		}
 		lasty = s.Y
 		last = s
 	}
 	//fmt.Println(last.X0, last.Y, done)
-	ep.Points = append(ep.Points, gg.Point{float64(last.X0), float64(last.Y)})
+	np := gg.Point{float64(last.X0), float64(last.Y)}
+	if ep.AppendAtEnd {
+		ep.Points = append(ep.Points, np)
+	} else {
+		ep.Points = append([]gg.Point{np}, ep.Points...)
+	}
 }
 
-func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64, way bool) {
+func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64, appendAtEnd bool) {
 
 	var p raster.Path
 	p.Start(Fixed(x1, y1))
@@ -102,21 +113,13 @@ func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64, way bool) {
 
 	ep := &EightPainter{}
 	ep.Points = []gg.Point{}
+	ep.AppendAtEnd = appendAtEnd
 
 	r := raster.NewRasterizer(1920, 1080)
 	r.UseNonZeroWinding = true
 	r.Clear()
 	r.AddStroke(p, fix(24), raster.RoundCapper, raster.RoundJoiner)
 	r.Rasterize(ep)
-
-	tempPoints := []gg.Point{}
-	if way {
-		for _, p := range ep.Points {
-			tempPoints = append([]gg.Point{p}, tempPoints...)
-		}
-		ep.Points = tempPoints
-		ep.Points = append(ep.Points, gg.Point{x2, y2})
-	}
 
 	var c *gg.Context
 	for i, p := range ep.Points {

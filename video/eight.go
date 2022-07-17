@@ -11,26 +11,38 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
+type EightData struct {
+	P          gg.Point
+	UpsideDown bool
+}
+
+var eightChannel chan EightData = make(chan EightData, 1)
+
 func EightLoop(upsides ...bool) {
 	x := 746.0
 	y := 246.0
+	MakeArcDotGoing(upsides[3], x, y, 200, 0, 2.3, false)
+	x = 746.0
+	y = 246.0
 	MakeArcDotGoing(upsides[0], 60+x, 140+y, -200, 0, 2.3, true)
 	x = 400.0
 	y = 400.0
 	MakeArcDotGoing(upsides[1], x, y, 200, 0, 2.3, true)
 	MakeArcDotGoing(upsides[2], 60+x, 140+y, -200, 0, 2.3, false)
-	x = 746.0
-	y = 246.0
-	MakeArcDotGoing(upsides[3], x, y, 200, 0, 2.3, false)
+}
+
+func ReadEightChannelData() {
+	for thing := range eightChannel {
+		renderEightFrame(thing.P.X, thing.P.Y, thing.UpsideDown)
+	}
 }
 
 func MakeEight() {
 	RmRfBang()
 
-	//EightLoop(true, true, true, false)
-	//EightLoop(false, false, false, true)
-	EightLoop(false, false, false, true)
-	EightLoop(true, true, true, false)
+	go ReadEightChannelData()
+	EightLoop(false, false, false, false)
+	EightLoop(true, true, true, true)
 
 	//x := 1300.0
 	//y := 400.0
@@ -163,7 +175,7 @@ func MakeArcDotGoing(upsideDown bool, x, y, r, angle1, angle2 float64, sortBool 
 			continue
 		}
 		p := ep.Points[i]
-		renderEightFrame(p.X, p.Y, upsideDown)
+		eightChannel <- EightData{p, upsideDown}
 	}
 }
 
@@ -192,7 +204,7 @@ func MakeDotGoing(x1, y1, x2, y2 float64,
 				continue
 			}
 			p := ep.Points[i]
-			renderEightFrame(p.X, p.Y, upsideDown)
+			eightChannel <- EightData{p, upsideDown}
 		}
 	} else {
 		for i := len(ep.Points) - 1; i > 0; i-- {
@@ -200,7 +212,7 @@ func MakeDotGoing(x1, y1, x2, y2 float64,
 				continue
 			}
 			p := ep.Points[i]
-			renderEightFrame(p.X, p.Y, upsideDown)
+			eightChannel <- EightData{p, upsideDown}
 		}
 	}
 }

@@ -50,7 +50,10 @@ func MakeEight() {
 	dc.DrawLine(x, y, x-200, y+400)
 	dc.Stroke()
 
-	MakeDotGoing(dc, x, y, x+200, y+400)
+	MakeDotGoing(dc, x, y, x+200, y+400, false)
+	MakeDotGoing(dc, x+200, y+400, x, y, true)
+	MakeDotGoing(dc, x, y, x-200, y+400, false)
+	MakeDotGoing(dc, x-200, y+400, x, y, true)
 
 	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", 0))
 	ffmpeg("9")
@@ -89,7 +92,7 @@ func (ep *EightPainter) Paint(ss []raster.Span, done bool) {
 	ep.Points = append(ep.Points, gg.Point{float64(last.X0), float64(last.Y)})
 }
 
-func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64) {
+func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64, way bool) {
 
 	var p raster.Path
 	p.Start(Fixed(x1, y1))
@@ -105,6 +108,15 @@ func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64) {
 	r.Clear()
 	r.AddStroke(p, fix(24), raster.RoundCapper, raster.RoundJoiner)
 	r.Rasterize(ep)
+
+	tempPoints := []gg.Point{}
+	if way {
+		for _, p := range ep.Points {
+			tempPoints = append([]gg.Point{p}, tempPoints...)
+		}
+		ep.Points = tempPoints
+		ep.Points = append(ep.Points, gg.Point{x2, y2})
+	}
 
 	var c *gg.Context
 	for i, p := range ep.Points {

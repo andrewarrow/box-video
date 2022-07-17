@@ -10,8 +10,6 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
-var pattern gg.Pattern = gg.NewSolidPattern(color.White)
-
 func MakeEight() {
 	RmRfBang()
 	dc := gg.NewContext(1920, 1080)
@@ -67,7 +65,8 @@ func fix(x float64) fixed.Int26_6 {
 	return fixed.Int26_6(math.Round(x * 64))
 }
 
-func WhiteDot(dc *gg.Context, x, y float64) {
+func ColorDot(dc *gg.Context, x, y float64, c color.RGBA) {
+	pattern := gg.NewSolidPattern(c)
 	dc.SetFillStyle(pattern)
 	dc.DrawCircle(x, y, 24)
 	dc.Fill()
@@ -120,6 +119,7 @@ func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64, appendAtEnd bool) {
 	r.Clear()
 	r.AddStroke(p, fix(24), raster.RoundCapper, raster.RoundJoiner)
 	r.Rasterize(ep)
+	color := color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
 
 	var c *gg.Context
 	for i, p := range ep.Points {
@@ -128,7 +128,7 @@ func MakeDotGoing(dc *gg.Context, x1, y1, x2, y2 float64, appendAtEnd bool) {
 		}
 		fmt.Println(frameCount)
 		c = gg.NewContextForImage(dc.Image())
-		WhiteDot(c, p.X, p.Y)
+		ColorDot(c, p.X, p.Y, color)
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
 	}

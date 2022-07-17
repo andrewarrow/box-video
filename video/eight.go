@@ -109,7 +109,48 @@ func EightContext(dotx, doty float64, upsideDown bool) *gg.Context {
 	return dc
 }
 
-func MakeArcDotGoing(x1, y1, r, angle1, angle2 float64) {
+func MakeArcDotGoing(x, y, r, angle1, angle2 float64) {
+	var p raster.Path
+	p.Start(Fixed(x, y))
+	fmt.Println(p)
+	const n = 16
+	for i := 0; i < n; i++ {
+		p1 := float64(i+0) / n
+		p2 := float64(i+1) / n
+		a1 := angle1 + (angle2-angle1)*p1
+		a2 := angle1 + (angle2-angle1)*p2
+		x0 := x + r*math.Cos(a1)
+		y0 := y + r*math.Sin(a1)
+		x1 := x + r*math.Cos((a1+a2)/2)
+		y1 := y + r*math.Sin((a1+a2)/2)
+		x2 := x + r*math.Cos(a2)
+		y2 := y + r*math.Sin(a2)
+		cx := 2*x1 - x0/2 - x2/2
+		cy := 2*y1 - y0/2 - y2/2
+
+		if i == 0 {
+			p.Add1(Fixed(x0, y0))
+		}
+		p.Add2(Fixed(cx, cy), Fixed(x2, y2))
+	}
+	fmt.Println(p)
+	//fmt.Println("flattenPath", flattenPath(p))
+	//fmt.Println("rasterPath", rasterPath(flattenPath(p)))
+	ep := &EightPainter{}
+	ep.Points = []gg.Point{}
+	ras := raster.NewRasterizer(1920, 1080)
+	ras.UseNonZeroWinding = true
+	ras.Clear()
+	ras.AddStroke(p, fix(1), raster.SquareCapper, raster.RoundJoiner)
+	ras.Rasterize(ep)
+	fmt.Println(ep.Points)
+	for i := 0; i < len(ep.Points); i++ {
+		if i%40 != 0 {
+			continue
+		}
+		p := ep.Points[i]
+		renderEightFrame(p.X, p.Y, false)
+	}
 }
 
 func MakeDotGoing(x1, y1, x2, y2 float64,
@@ -137,7 +178,7 @@ func MakeDotGoing(x1, y1, x2, y2 float64,
 				continue
 			}
 			p := ep.Points[i]
-			renderEightFrame(p.X, p.Y, color, upsideDown)
+			renderEightFrame(p.X, p.Y, upsideDown)
 		}
 	} else {
 		for i := len(ep.Points) - 1; i > 0; i-- {
@@ -145,12 +186,12 @@ func MakeDotGoing(x1, y1, x2, y2 float64,
 				continue
 			}
 			p := ep.Points[i]
-			renderEightFrame(p.X, p.Y, color, upsideDown)
+			renderEightFrame(p.X, p.Y, upsideDown)
 		}
 	}
 }
 
-func renderEightFrame(x, y float64, color color.RGBA, upsideDown bool) {
+func renderEightFrame(x, y float64, upsideDown bool) {
 	var c *gg.Context
 	fmt.Println(frameCount)
 	c = EightContext(x, y, upsideDown)

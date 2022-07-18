@@ -44,6 +44,8 @@ func main() {
 		video.AddSound(v, a)
 	} else if command == "eight" {
 		video.MakeEight()
+	} else if command == "vibration" {
+		video.MakeVibration()
 	} else if command == "frames" {
 		file := os.Args[2]
 		name := os.Args[3]

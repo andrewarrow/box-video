@@ -13,6 +13,7 @@ const HD_H = 720  //1080
 
 var DotSize = 6.0
 var lastPoints []gg.Point
+var dotColor color.RGBA
 
 func MakeVibration() {
 	RmRfBang()
@@ -20,7 +21,29 @@ func MakeVibration() {
 	x := HD_W / 2.0
 	y := HD_H / 2.0
 
+	dotColor = color.RGBA{R: 0, G: 255, B: 255, A: 0xff}
+
 	points := PointsFromTo(x, y, x+300, y+300)
+	FramePoints(points, true, 1)
+	points = PointsFromTo(x+300, y+300, x+600, y)
+	FramePoints(points, false, 2)
+	points = PointsFromTo(x+600, y, x+300, y-300)
+	FramePoints(points, false, 4)
+	points = PointsFromTo(x+300, y-300, x, y)
+	FramePoints(points, true, 8)
+	points = PointsFromTo(x, y, x-300, y+300)
+	FramePoints(points, true, 8)
+	points = PointsFromTo(x-300, y+300, x-600, y)
+	FramePoints(points, false, 16)
+	points = PointsFromTo(x-600, y, x-300, y-300)
+	FramePoints(points, false, 32)
+	points = PointsFromTo(x-300, y-300, x, y)
+	FramePoints(points, true, 1)
+	lastPoints = []gg.Point{}
+
+	DotSize = 6.0
+	dotColor = color.RGBA{R: 255, G: 0, B: 255, A: 0xff}
+	points = PointsFromTo(x, y, x+300, y+300)
 	FramePoints(points, true, 1)
 	points = PointsFromTo(x+300, y+300, x+600, y)
 	FramePoints(points, false, 2)
@@ -107,8 +130,7 @@ func PointsFromTo(x1, y1, x2, y2 float64) []gg.Point {
 }
 
 func ColorSizeDot(dc *gg.Context, x, y, size float64) {
-	white := color.RGBA{R: 255, G: 0, B: 0, A: 0xff}
-	pattern := gg.NewSolidPattern(white)
+	pattern := gg.NewSolidPattern(dotColor)
 	dc.SetFillStyle(pattern)
 	dc.DrawCircle(x, y, size)
 	dc.Fill()

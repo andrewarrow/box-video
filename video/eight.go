@@ -85,15 +85,15 @@ func MakeEight() {
 		}
 	}()
 
-	time.Sleep(time.Second * 120)
+	time.Sleep(time.Second * 320)
 	done = true
 	time.Sleep(time.Second * 100)
-	ffmpeg("36")
+	ffmpeg("96")
 }
 
 func EightContext() *gg.Context {
 	dc := gg.NewContext(1920, 1080)
-	dc.SetRGB(0, 200, 200)
+	dc.SetRGB(255, 255, 255)
 	dc.Clear()
 	dc.SetLineWidth(6)
 
@@ -107,7 +107,7 @@ func EightContext() *gg.Context {
 	x := 400.0
 	y := 400.0
 
-	dc.SetRGB(255, 255, 255)
+	dc.SetRGB(0, 0, 0)
 	dc.LoadFontFace("arial.ttf", 26)
 	dc.DrawString("0", x+210, y+40)
 	one := "+1"
@@ -141,20 +141,20 @@ func EightContext() *gg.Context {
 	dc.DrawString(five, x+60, y-90)
 	dc.DrawString(seven, x-160, y+40)
 
-	dc.SetRGB(0, 40, 255)
+	dc.SetRGB(0, 215, 255)
 	dc.DrawArc(x, y, 200, 0, 2.3)
 	dc.Stroke()
-	dc.SetRGB(40, 0, 255)
+	dc.SetRGB(215, 0, 255)
 	dc.DrawArc(60+x, 140+y, -200, 0, 2.3)
 	dc.Stroke()
 
 	x = 746.0
 	y = 246.0
 
-	dc.SetRGB(40, 0, 255)
+	dc.SetRGB(215, 0, 255)
 	dc.DrawArc(x, y, 200, 0, 2.3)
 	dc.Stroke()
-	dc.SetRGB(0, 40, 255)
+	dc.SetRGB(0, 215, 255)
 	dc.DrawArc(60+x, 140+y, -200, 0, 2.3)
 	dc.Stroke()
 
@@ -165,7 +165,7 @@ func EightContext() *gg.Context {
 
 	dc.DrawLine(x, y, x+200, y+400)
 	dc.Stroke()
-	dc.SetRGB(0, 40, 255)
+	dc.SetRGB(0, 215, 255)
 	dc.DrawLine(x, y, x-200, y+400)
 	dc.Stroke()
 
@@ -176,7 +176,7 @@ func EightContext() *gg.Context {
 		ColorDot(dc, rightDotx, rightDoty)
 	}
 
-	dc.SetRGB(255, 255, 255)
+	dc.SetRGB(0, 0, 0)
 	dc.LoadFontFace("arialbd.ttf", 96)
 	nine := "+9"
 	if upsideDownRight {
@@ -307,7 +307,7 @@ func fix(x float64) fixed.Int26_6 {
 }
 
 func ColorDot(dc *gg.Context, x, y float64) {
-	white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
+	white := color.RGBA{R: 0, G: 0, B: 0, A: 0xff}
 	pattern := gg.NewSolidPattern(white)
 	dc.SetFillStyle(pattern)
 	dc.DrawCircle(x, y, 24)

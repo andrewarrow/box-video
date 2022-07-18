@@ -11,6 +11,8 @@ import (
 const HD_W = 1280 //1920
 const HD_H = 720  //1080
 
+var DotSize = 6.0
+
 func MakeVibration() {
 	RmRfBang()
 
@@ -18,19 +20,19 @@ func MakeVibration() {
 	y := HD_H / 2.0
 
 	points := PointsFromTo(x, y, x+300, y+300)
-	FramePoints(points, true)
+	FramePoints(points, true, 1)
 	points = PointsFromTo(x+300, y+300, x+600, y)
-	FramePoints(points, false)
+	FramePoints(points, false, 2)
 	points = PointsFromTo(x+600, y, x+300, y-300)
-	FramePoints(points, false)
+	FramePoints(points, false, 4)
 	points = PointsFromTo(x+300, y-300, x-300, y+300)
-	FramePoints(points, true)
+	FramePoints(points, true, 8)
 	points = PointsFromTo(x-300, y+300, x-600, y)
-	FramePoints(points, false)
+	FramePoints(points, false, 16)
 	points = PointsFromTo(x-600, y, x-300, y-300)
-	FramePoints(points, false)
+	FramePoints(points, false, 32)
 	points = PointsFromTo(x-300, y-300, x, y)
-	FramePoints(points, true)
+	FramePoints(points, true, 1)
 	ffmpeg("96")
 	//SetNiceBlue(dc)
 	//dc.MoveTo(x, y)
@@ -45,31 +47,33 @@ func MakeVibration() {
 	//dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 }
 
-func FramePoints(points []gg.Point, dir bool) {
+func FramePoints(points []gg.Point, dir bool, size int) {
+	len64 := float64(len(points))
 	if dir {
 		for i := 0; i < len(points); i++ {
 			if i%40 != 0 {
 				continue
 			}
-			DrawVibrationFrame(i, points[i])
+			DrawVibrationFrame(float64(i)/len64, size, points[i])
 		}
 	} else {
 		for i := len(points) - 1; i > 0; i-- {
 			if i%40 != 0 {
 				continue
 			}
-			DrawVibrationFrame(i, points[i])
+			DrawVibrationFrame(float64(i)/len64, size, points[i])
 		}
 	}
 }
 
-func DrawVibrationFrame(i int, p gg.Point) {
+func DrawVibrationFrame(per float64, size int, p gg.Point) {
 	dc := gg.NewContext(HD_W, HD_H)
 	dc.SetRGB(0, 0, 0)
 	dc.Clear()
-	ColorSizeDot(dc, p.X, p.Y, float64(i)/300.0)
+	ColorSizeDot(dc, p.X, p.Y, DotSize)
 	dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 	frameCount++
+	DotSize += 0.06
 	fmt.Println(frameCount)
 }
 

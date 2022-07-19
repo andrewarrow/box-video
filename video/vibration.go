@@ -13,6 +13,7 @@ const HD_H = 720  //1080
 
 var DotSize = 6.0
 var lastPoints []gg.Point
+var lastDots []gg.Point
 var dotColor color.RGBA
 
 func MakeVibration() {
@@ -29,25 +30,26 @@ func MakeVibration() {
 			dotColor = color.RGBA{R: 255, G: 0, B: 255, A: 0xff}
 		}
 		lastPoints = []gg.Point{}
+		lastDots = []gg.Point{}
 		DotSize = 6.0
-		points := PointsFromTo(x, y, x+300, y+300)
+		points := PointsFromTo(x, y, x+300, y+300) //    from zero to ONE
 		FramePoints(points, true, 1)
-		points = PointsFromTo(x+300, y+300, x+600, y)
+		points = PointsFromTo(x+300, y+300, x+600, y) // from ONE to TWO
 		FramePoints(points, false, 2)
-		points = PointsFromTo(x+600, y, x+300, y-300)
+		points = PointsFromTo(x+600, y, x+300, y-300) // from TWO to FOUR
 		FramePoints(points, false, 4)
-		points = PointsFromTo(x+300, y-300, x, y)
+		points = PointsFromTo(x+300, y-300, x, y) //     from FOUR thru zero
 		FramePoints(points, true, 8)
-		points = PointsFromTo(x, y, x-300, y+300)
+		points = PointsFromTo(x, y, x-300, y+300) //     thru zero to EIGHT
 		FramePoints(points, true, 8)
-		points = PointsFromTo(x-300, y+300, x-600, y)
+		points = PointsFromTo(x-300, y+300, x-600, y) // from EIGHT to SEVEN
 		FramePoints(points, false, 16)
-		points = PointsFromTo(x-600, y, x-300, y-300)
+		points = PointsFromTo(x-600, y, x-300, y-300) // from SEVEN to FIVE
 		FramePoints(points, false, 32)
-		points = PointsFromTo(x-300, y-300, x, y)
+		points = PointsFromTo(x-300, y-300, x, y) //     from FIVE thru zero to ONE
 		FramePoints(points, true, 1)
 		i++
-		if i > 60 {
+		if i > 1 {
 			break
 		}
 	}
@@ -86,21 +88,27 @@ func FramePoints(points []gg.Point, dir bool, size int) {
 		}
 		lastPoint = points[0]
 	}
-	lastPoints = append(lastPoints, lastPoint)
+	lastDots = append(lastDots, lastPoint)
 }
 
 func DrawVibrationFrame(per float64, size int, p gg.Point) {
 	dc := gg.NewContext(HD_W, HD_H)
 	dc.SetRGB(0, 0, 0)
 	dc.Clear()
-	ColorSizeDot(dc, p.X, p.Y, DotSize)
+	//ColorSizeDot(dc, p.X, p.Y, 6)
 	DotSize += 0.06
 	for _, lp := range lastPoints {
-		ColorSizeDot(dc, lp.X, lp.Y, 10)
+		ColorSizeDot(dc, lp.X, lp.Y, 1)
 	}
+
+	for _, ld := range lastDots {
+		ColorSizeDot(dc, ld.X, ld.Y, 10)
+	}
+
 	dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 	frameCount++
 	fmt.Println(frameCount)
+	lastPoints = append(lastPoints, p)
 }
 
 func PointsFromTo(x1, y1, x2, y2 float64) []gg.Point {

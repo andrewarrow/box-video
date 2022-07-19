@@ -21,6 +21,7 @@ func MakeVibration() {
 
 	x := HD_W / 2.0
 	y := HD_H / 2.0
+	unit := 200.0
 
 	i := 0
 	for {
@@ -32,19 +33,19 @@ func MakeVibration() {
 		lastPoints = []gg.Point{}
 		lastDots = []gg.Point{}
 		DotSize = 6.0
-		points := PointsFromTo(x, y, x+300, y+300) //        from zero to ONE
+		points := PointsFromTo(x, y, x+unit, y+unit) //          from zero to ONE
 		FramePoints(points, true, 1)
-		points = PointsFromTo(x+300, y+300, x+600, y) //     from ONE to TWO
+		points = PointsFromTo(x+unit, y+unit, x+(unit*2), y) //  from ONE to TWO
 		FramePoints(points, false, 2)
-		points = PointsFromTo(x+600, y, x+300, y-300) //     from TWO to FOUR
+		points = PointsFromTo(x+(unit*2), y, x+unit, y-unit) //  from TWO to FOUR
 		FramePoints(points, false, 4)
-		points = PointsFromTo(x+300, y-300, x-300, y+300) // from FOUR to EIGHT
+		points = PointsFromTo(x+unit, y-unit, x-unit, y+unit) // from FOUR to EIGHT
 		FramePoints(points, true, 8)
-		points = PointsFromTo(x-300, y+300, x-600, y) //     from EIGHT to SEVEN
+		points = PointsFromTo(x-unit, y+unit, x-(unit*2), y) //  from EIGHT to SEVEN
 		FramePoints(points, false, 16)
-		points = PointsFromTo(x-600, y, x-300, y-300) //     from SEVEN to FIVE
+		points = PointsFromTo(x-(unit*2), y, x-unit, y-unit) //  from SEVEN to FIVE
 		FramePoints(points, false, 32)
-		points = PointsFromTo(x-300, y-300, x, y) //         from FIVE thru zero to ONE
+		points = PointsFromTo(x-unit, y-unit, x, y) //           from FIVE thru zero to ONE
 		FramePoints(points, true, 1)
 		i++
 		if i > 1 {
@@ -100,17 +101,17 @@ func DrawVibrationFrame(per float64, size int, p gg.Point) {
 	}
 
 	for i, ld := range lastDots {
-		ds := 3
+		ds := 2
 		if i == 1 {
-			ds = 6
+			ds = 4
 		} else if i == 2 {
-			ds = 12
+			ds = 8
 		} else if i == 3 {
-			ds = 24
+			ds = 16
 		} else if i == 4 {
-			ds = 48
+			ds = 32
 		} else if i == 5 {
-			ds = 48 * 2
+			ds = 64
 		}
 		ColorSizeDot(dc, ld.X, ld.Y, float64(ds))
 	}

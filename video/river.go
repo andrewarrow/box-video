@@ -24,17 +24,19 @@ func MakeRiver() {
 	y = y - (y / 2.0)
 
 	riverDots := []*RiverDot{}
-	rd := RiverDot{}
-	rd.X = x
-	rd.Y = y
-	rd.C = color.RGBA{R: 0, G: 255, B: 255, A: 0xff}
-	riverDots = append(riverDots, &rd)
-
-	rd2 := RiverDot{}
-	rd2.X = x - 39
-	rd2.Y = y - 56
-	rd2.C = color.RGBA{R: 255, G: 0, B: 255, A: 0xff}
-	riverDots = append(riverDots, &rd2)
+	for {
+		rd := RiverDot{}
+		rd.X = x
+		rd.Y = y
+		rd.C = color.RGBA{R: 0, G: 255, B: 255, A: 0xff}
+		if rand.Intn(2) == 0 {
+			rd.C = color.RGBA{R: 255, G: 0, B: 255, A: 0xff}
+		}
+		riverDots = append(riverDots, &rd)
+		if len(riverDots) > 6000 {
+			break
+		}
+	}
 
 	for {
 		dc := gg.NewContext(HD_W, HD_H)
@@ -42,7 +44,7 @@ func MakeRiver() {
 		dc.Clear()
 		for _, rd := range riverDots {
 			dotColor = rd.C
-			ColorSizeDot(dc, rd.X, rd.Y, 10)
+			ColorSizeDot(dc, rd.X, rd.Y, 1)
 
 			xr := rand.Intn(10)
 			if rand.Intn(1) == 0 {
@@ -51,11 +53,15 @@ func MakeRiver() {
 			yr := rand.Intn(10)
 			rd.X += float64(xr)
 			rd.Y += float64(yr)
+			if rd.X < 0 && rd.Y > HD_H {
+				rd.X = x
+				rd.Y = y
+			}
 		}
 		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
 
-		if frameCount > 100 {
+		if frameCount > 200 {
 			break
 		}
 	}

@@ -22,7 +22,7 @@ func MakeRiver() {
 	y := HD_H / 2.0
 
 	x = x + (x / 2.0)
-	y = y - (y / 2.0)
+	y = 0
 
 	riverDots := []*RiverDot{}
 	for {
@@ -72,6 +72,12 @@ func MakeRiver() {
 	}
 
 	frameCount = 0
+	r1 := byte(rand.Intn(256))
+	g1 := byte(rand.Intn(256))
+	b1 := byte(rand.Intn(256))
+	r2 := byte(rand.Intn(256))
+	g2 := byte(rand.Intn(256))
+	b2 := byte(rand.Intn(256))
 
 	for {
 		dc := gg.NewContext(HD_W, HD_H)
@@ -90,20 +96,42 @@ func MakeRiver() {
 				rd.Y = y
 				if rd.Label == "" {
 					rd.C = color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
+					if rand.Intn(2) == 0 {
+						rd.C = color.RGBA{R: 255, G: 0, B: 255, A: 0xff}
+					}
 					rd.Label = "white"
 				} else if rd.Label == "white" {
 					rd.C = color.RGBA{R: 255, G: 215, B: 0, A: 0xff}
+					if rand.Intn(2) == 0 {
+						rd.C = color.RGBA{R: 0, G: 255, B: 255, A: 0xff}
+					}
 					rd.Label = "gold"
+					r1 = byte(rand.Intn(256))
+					g1 = byte(rand.Intn(256))
+					b1 = byte(rand.Intn(256))
+					r2 = byte(rand.Intn(256))
+					g2 = byte(rand.Intn(256))
+					b2 = byte(rand.Intn(256))
+				} else if rd.Label == "gold" {
+					rd.C = color.RGBA{R: 215, G: 0, B: 200, A: 0xff}
+					if rand.Intn(2) == 0 {
+						rd.C = color.RGBA{R: 100, G: 100, B: 200, A: 0xff}
+					}
+					rd.Label = "rand"
 				} else {
-					rd.C = color.RGBA{R: 215, G: 215, B: 0, A: 0xff}
+					rd.C = color.RGBA{R: r1, G: g1, B: b1, A: 0xff}
+					if rand.Intn(2) == 0 {
+						rd.C = color.RGBA{R: r2, G: g2, B: b2, A: 0xff}
+					}
 					rd.Label = ""
 				}
 			}
 		}
 		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
+		fmt.Println(frameCount)
 
-		if frameCount > 200 {
+		if frameCount > 9800 {
 			break
 		}
 	}

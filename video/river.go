@@ -30,15 +30,19 @@ func MakeRiver() {
 	dc.SetRGB(0, 0, 0)
 	dc.Clear()
 
-	DrawRiverLine(dc, x, y)
-	DrawRiverLine(dc, HD_W, 9)
+	leftEdge := DrawRiverLine(dc, x, y)
+	rightEdge := DrawRiverLine(dc, HD_W, 9)
+
+	fmt.Println(len(leftEdge), len(rightEdge))
 
 	ffmpeg("18")
 }
 
-func DrawRiverLine(dc *gg.Context, x, y float64) {
+func DrawRiverLine(dc *gg.Context, x, y float64) []gg.Point {
+	items := []gg.Point{}
 	for {
 		ColorSizeDot(dc, x, y, 1)
+		items = append(items, gg.Point{x, y})
 
 		xr := rand.Intn(13) * -1
 		yr := rand.Intn(10)
@@ -51,6 +55,7 @@ func DrawRiverLine(dc *gg.Context, x, y float64) {
 		frameCount++
 		fmt.Println(frameCount)
 	}
+	return items
 }
 
 func MakeRiver2() {

@@ -19,43 +19,57 @@ func MakeRiver() {
 	RmRfBang()
 
 	x := HD_W / 2.0
-	y := HD_H / 2.0
+	//y := HD_H / 2.0
 
 	x = x + (x / 2.0)
-	x = x - 60
-	y = 9
+	xi := int(x) - 60
+	yi := int(9)
 	white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
 	dotColor = white
 	dc := gg.NewContext(HD_W, HD_H)
 	dc.SetRGB(0, 0, 0)
 	dc.Clear()
 
-	leftEdge := DrawRiverLine(dc, x, y)
-	rightEdge := DrawRiverLine(dc, HD_W, 9)
+	leftEdge := DrawRiverLine(dc, xi, yi)
+	rightEdge := DrawRiverLine(dc, int(HD_W), 9)
 
 	fmt.Println(len(leftEdge), len(rightEdge))
 
 	ffmpeg("18")
 }
 
-func DrawRiverLine(dc *gg.Context, x, y float64) []gg.Point {
-	items := []gg.Point{}
+func DrawRiverLine(dc *gg.Context, x, y int) map[int]int {
+	// for this Y what is x?
+	m := map[int]int{}
+	var lastY int
 	for {
-		ColorSizeDot(dc, x, y, 1)
-		items = append(items, gg.Point{x, y})
+		ColorSizeDot(dc, float64(x), float64(y), 1)
+		m[y] = x
+		if lastY > 0 {
+			// lastY was 1, now we on 10, 2,3,4,5,6,7,8,9 set to x
+			sub := lastY + 1
+			for {
+				m[sub] = x
+				sub++
+				if sub >= y {
+					break
+				}
+			}
+		}
 
 		xr := rand.Intn(13) * -1
 		yr := rand.Intn(10)
-		x += float64(xr)
-		y += float64(yr)
-		if y >= HD_H {
+		x += xr
+		lastY = y
+		y += yr
+		if y >= int(HD_H) {
 			break
 		}
 		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
 		fmt.Println(frameCount)
 	}
-	return items
+	return m
 }
 
 func MakeRiver2() {

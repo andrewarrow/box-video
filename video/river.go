@@ -15,6 +15,9 @@ type RiverDot struct {
 	Label string
 }
 
+var leftEdge map[int]int
+var rightEdge map[int]int
+
 func MakeRiver() {
 	RmRfBang()
 
@@ -30,12 +33,33 @@ func MakeRiver() {
 	dc.SetRGB(0, 0, 0)
 	dc.Clear()
 
-	leftEdge := DrawRiverLine(dc, xi, yi)
-	rightEdge := DrawRiverLine(dc, int(HD_W), 9)
+	leftEdge = DrawRiverLine(dc, xi, yi)
+	rightEdge = DrawRiverLine(dc, int(HD_W), 9)
 
 	fmt.Println(len(leftEdge), len(rightEdge))
 
+	MoveDotDownRiver(xi+190, yi)
+
 	ffmpeg("18")
+}
+
+func MoveDotDownRiver(x, y int) {
+	for {
+		//ColorSizeDot(dc, float64(x), float64(y), 1)
+
+		fmt.Println("mddr", x, y, leftEdge[y], rightEdge[y])
+
+		xr := rand.Intn(13) * -1
+		yr := rand.Intn(10)
+		x += xr
+		y += yr
+		if y >= int(HD_H) {
+			break
+		}
+		//dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
+		//frameCount++
+		//fmt.Println(frameCount)
+	}
 }
 
 func DrawRiverLine(dc *gg.Context, x, y int) map[int]int {
@@ -68,6 +92,14 @@ func DrawRiverLine(dc *gg.Context, x, y int) map[int]int {
 		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
 		fmt.Println(frameCount)
+	}
+	sub := lastY + 1
+	for {
+		m[sub] = x
+		sub++
+		if sub >= y {
+			break
+		}
 	}
 	return m
 }

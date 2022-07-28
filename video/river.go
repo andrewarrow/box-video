@@ -38,14 +38,15 @@ func MakeRiver() {
 
 	fmt.Println(len(leftEdge), len(rightEdge))
 
-	MoveDotDownRiver(xi+190, yi)
+	dotColor = color.RGBA{R: 0, G: 255, B: 255, A: 0xff}
+	MoveDotDownRiver(dc, xi+190, yi)
 
 	ffmpeg("18")
 }
 
-func MoveDotDownRiver(x, y int) {
+func MoveDotDownRiver(dc *gg.Context, x, y int) {
 	for {
-		//ColorSizeDot(dc, float64(x), float64(y), 1)
+		ColorSizeDot(dc, float64(x), float64(y), 6)
 
 		fmt.Println("mddr", x, y, leftEdge[y], rightEdge[y])
 
@@ -56,9 +57,9 @@ func MoveDotDownRiver(x, y int) {
 		if y >= int(HD_H) {
 			break
 		}
-		//dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
-		//frameCount++
-		//fmt.Println(frameCount)
+		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
+		frameCount++
+		fmt.Println(frameCount)
 	}
 }
 

@@ -22,6 +22,44 @@ func MakeRiver() {
 	y := HD_H / 2.0
 
 	x = x + (x / 2.0)
+	x = x - 60
+	y = 9
+	white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
+	dotColor = white
+	dc := gg.NewContext(HD_W, HD_H)
+	dc.SetRGB(0, 0, 0)
+	dc.Clear()
+
+	DrawRiverLine(dc, x, y)
+	DrawRiverLine(dc, HD_W, 9)
+
+	ffmpeg("18")
+}
+
+func DrawRiverLine(dc *gg.Context, x, y float64) {
+	for {
+		ColorSizeDot(dc, x, y, 1)
+
+		xr := rand.Intn(13) * -1
+		yr := rand.Intn(10)
+		x += float64(xr)
+		y += float64(yr)
+		if y >= HD_H {
+			break
+		}
+		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
+		frameCount++
+		fmt.Println(frameCount)
+	}
+}
+
+func MakeRiver2() {
+	RmRfBang()
+
+	x := HD_W / 2.0
+	y := HD_H / 2.0
+
+	x = x + (x / 2.0)
 	y = 0
 
 	riverDots := []*RiverDot{}

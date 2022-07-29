@@ -63,7 +63,7 @@ func MoveDotsDownRiver(dc *gg.Context, dots []*RiverDot) {
 	for {
 		c := gg.NewContextForImage(dc.Image())
 		for _, dot := range dots {
-			ColorSizeDot(c, float64(dot.X), float64(dot.Y), 3)
+			ColorSizeDot(c, float64(dot.X), float64(dot.Y), 6)
 
 			//fmt.Println("mddr", x, y, leftEdge[y], rightEdge[y])
 

@@ -9,8 +9,8 @@ import (
 )
 
 type RiverDot struct {
-	X     float64
-	Y     float64
+	X     int
+	Y     int
 	C     color.RGBA
 	Label string
 }
@@ -39,27 +39,46 @@ func MakeRiver() {
 	fmt.Println(len(leftEdge), len(rightEdge))
 
 	dotColor = color.RGBA{R: 0, G: 255, B: 255, A: 0xff}
-	MoveDotDownRiver(dc, xi+190, yi)
+	riverDots := []*RiverDot{}
+	for {
+		rd := RiverDot{}
+		rd.X = xi + rand.Intn(190)
+		rd.Y = 0
+		rd.C = color.RGBA{R: 0, G: 255, B: 255, A: 0xff}
+		if rand.Intn(2) == 0 {
+			rd.C = color.RGBA{R: 255, G: 0, B: 255, A: 0xff}
+		}
+		riverDots = append(riverDots, &rd)
+		if len(riverDots) > 60 {
+			break
+		}
+	}
+	MoveDotsDownRiver(dc, riverDots)
 
 	ffmpeg("18")
 }
 
-func MoveDotDownRiver(dc *gg.Context, x, y int) {
+func MoveDotsDownRiver(dc *gg.Context, dots []*RiverDot) {
 	for {
-		ColorSizeDot(dc, float64(x), float64(y), 6)
+		for _, dot := range dots {
+			ColorSizeDot(dc, float64(dot.X), float64(dot.Y), 3)
 
-		fmt.Println("mddr", x, y, leftEdge[y], rightEdge[y])
+			//fmt.Println("mddr", x, y, leftEdge[y], rightEdge[y])
 
-		xr := rand.Intn(13) * -1
-		yr := rand.Intn(10)
-		x += xr
-		y += yr
-		if y >= int(HD_H) {
-			break
+			xr := rand.Intn(10)
+			if rand.Intn(2) == 0 {
+				xr = xr * -1
+			}
+			yr := rand.Intn(10)
+			dot.X += xr
+			dot.Y += yr
 		}
 		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
 		fmt.Println(frameCount)
+		if frameCount > 200 {
+			break
+		}
 	}
 }
 
@@ -105,6 +124,7 @@ func DrawRiverLine(dc *gg.Context, x, y int) map[int]int {
 	return m
 }
 
+/*
 func MakeRiver2() {
 	RmRfBang()
 
@@ -229,3 +249,4 @@ func MakeRiver2() {
 	ffmpeg("9")
 
 }
+*/

@@ -26,7 +26,7 @@ func MakeRiver() {
 
 	x = x + (x / 2.0)
 	xi := int(x) - 60
-	yi := int(9)
+	yi := int(0)
 	white := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
 	dotColor = white
 	dc := gg.NewContext(HD_W, HD_H)
@@ -34,7 +34,7 @@ func MakeRiver() {
 	dc.Clear()
 
 	leftEdge = DrawRiverLine(dc, xi, yi)
-	rightEdge = DrawRiverLine(dc, int(HD_W), 9)
+	rightEdge = DrawRiverLine(dc, int(HD_W), 0)
 
 	fmt.Println(len(leftEdge), len(rightEdge))
 
@@ -42,7 +42,8 @@ func MakeRiver() {
 	riverDots := []*RiverDot{}
 	for {
 		rd := RiverDot{}
-		rd.X = xi + rand.Intn(190)
+		fmt.Println(rightEdge[0]-leftEdge[0], rightEdge[0], leftEdge[0])
+		rd.X = leftEdge[0] + rand.Intn(rightEdge[0]-leftEdge[0])
 		rd.Y = 0
 		rd.C = color.RGBA{R: 0, G: 255, B: 255, A: 0xff}
 		if rand.Intn(2) == 0 {
@@ -73,6 +74,12 @@ func MoveDotsDownRiver(dc *gg.Context, dots []*RiverDot) {
 			yr := rand.Intn(10)
 			dot.X += xr
 			dot.Y += yr
+			if dot.X < leftEdge[dot.Y] || dot.X > rightEdge[dot.Y] {
+				delta := rightEdge[dot.Y] - leftEdge[dot.Y]
+				if delta > 0 {
+					dot.X = leftEdge[dot.Y] + rand.Intn(delta)
+				}
+			}
 		}
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++

@@ -76,7 +76,7 @@ func MoveDotsDownRiver(dc *gg.Context, dots []*RiverDot) {
 		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
 		fmt.Println(frameCount)
-		if frameCount > 200 {
+		if frameCount > 600 {
 			break
 		}
 	}

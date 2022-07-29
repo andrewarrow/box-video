@@ -60,8 +60,9 @@ func MakeRiver() {
 
 func MoveDotsDownRiver(dc *gg.Context, dots []*RiverDot) {
 	for {
+		c := gg.NewContextForImage(dc.Image())
 		for _, dot := range dots {
-			ColorSizeDot(dc, float64(dot.X), float64(dot.Y), 3)
+			ColorSizeDot(c, float64(dot.X), float64(dot.Y), 3)
 
 			//fmt.Println("mddr", x, y, leftEdge[y], rightEdge[y])
 
@@ -73,7 +74,7 @@ func MoveDotsDownRiver(dc *gg.Context, dots []*RiverDot) {
 			dot.X += xr
 			dot.Y += yr
 		}
-		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
+		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
 		fmt.Println(frameCount)
 		if frameCount > 600 {

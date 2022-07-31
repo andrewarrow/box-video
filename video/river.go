@@ -17,6 +17,7 @@ type RiverDot struct {
 
 var leftEdge map[int]int
 var rightEdge map[int]int
+var riverDots []*RiverDot
 
 func MakeRiver() {
 	RmRfBang()
@@ -39,10 +40,17 @@ func MakeRiver() {
 	fmt.Println(len(leftEdge), len(rightEdge))
 
 	dotColor = color.RGBA{R: 0, G: 255, B: 255, A: 0xff}
-	riverDots := []*RiverDot{}
+	AddRiverDots()
+	MoveDotsDownRiver(dc)
+
+	ffmpeg("18")
+}
+
+func AddRiverDots() {
+	i := 0
 	for {
 		rd := RiverDot{}
-		fmt.Println(rightEdge[0]-leftEdge[0], rightEdge[0], leftEdge[0])
+		//fmt.Println(rightEdge[0]-leftEdge[0], rightEdge[0], leftEdge[0])
 		rd.X = leftEdge[0] + rand.Intn(rightEdge[0]-leftEdge[0])
 		rd.Y = 0
 		rd.C = color.RGBA{R: 0, G: 255, B: 255, A: 0xff}
@@ -50,19 +58,18 @@ func MakeRiver() {
 			rd.C = color.RGBA{R: 255, G: 0, B: 255, A: 0xff}
 		}
 		riverDots = append(riverDots, &rd)
-		if len(riverDots) > 60 {
+		if i > 60 {
 			break
 		}
+		i++
 	}
-	MoveDotsDownRiver(dc, riverDots)
-
-	ffmpeg("18")
 }
 
-func MoveDotsDownRiver(dc *gg.Context, dots []*RiverDot) {
+func MoveDotsDownRiver(dc *gg.Context) {
 	for {
 		c := gg.NewContextForImage(dc.Image())
-		for _, dot := range dots {
+		for _, dot := range riverDots {
+			dotColor = dot.C
 			ColorSizeDot(c, float64(dot.X), float64(dot.Y), 6)
 
 			//fmt.Println("mddr", x, y, leftEdge[y], rightEdge[y])
@@ -80,6 +87,9 @@ func MoveDotsDownRiver(dc *gg.Context, dots []*RiverDot) {
 					dot.X = leftEdge[dot.Y] + rand.Intn(delta)
 				}
 			}
+		}
+		if rand.Intn(20) == 0 {
+			AddRiverDots()
 		}
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
@@ -117,9 +127,9 @@ func DrawRiverLine(dc *gg.Context, x, y int) map[int]int {
 		if y >= int(HD_H) {
 			break
 		}
-		dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
-		frameCount++
-		fmt.Println(frameCount)
+		//dc.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
+		//frameCount++
+		//fmt.Println(frameCount)
 	}
 	sub := lastY + 1
 	for {

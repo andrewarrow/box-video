@@ -62,6 +62,19 @@ func ChangeColors() {
 	b2 = byte(rand.Intn(256))
 }
 
+func PruneDots() {
+	fmt.Println("PruneDots1", len(riverDots))
+	replace := []*RiverDot{}
+	for _, dot := range riverDots {
+		if dot.Y > int(HD_H) {
+			continue
+		}
+		replace = append(replace, dot)
+	}
+	riverDots = replace
+	fmt.Println("PruneDots2", len(riverDots))
+}
+
 func AddRiverDots() {
 	i := 0
 	for {
@@ -107,13 +120,14 @@ func MoveDotsDownRiver(dc *gg.Context) {
 		if rand.Intn(40) == 0 {
 			ChangeColors()
 		}
-		if rand.Intn(20) == 0 {
+		if rand.Intn(6) == 0 {
+			PruneDots()
 			AddRiverDots()
 		}
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
 		fmt.Println(frameCount)
-		if frameCount > 600 {
+		if frameCount > 1200*10 {
 			break
 		}
 	}

@@ -18,6 +18,7 @@ type RiverDot struct {
 var leftEdge map[int]int
 var rightEdge map[int]int
 var riverDots []*RiverDot
+var r1, g1, b1, r2, g2, b2 byte
 
 func MakeRiver() {
 	RmRfBang()
@@ -39,11 +40,26 @@ func MakeRiver() {
 
 	fmt.Println(len(leftEdge), len(rightEdge))
 
-	dotColor = color.RGBA{R: 0, G: 255, B: 255, A: 0xff}
+	//dotColor = color.RGBA{R: 0, G: 255, B: 255, A: 0xff}
+	r1 = byte(0)
+	g1 = byte(255)
+	b1 = byte(255)
+	r2 = byte(255)
+	g2 = byte(0)
+	b2 = byte(255)
 	AddRiverDots()
 	MoveDotsDownRiver(dc)
 
 	ffmpeg("18")
+}
+
+func ChangeColors() {
+	r1 = byte(rand.Intn(256))
+	g1 = byte(rand.Intn(256))
+	b1 = byte(rand.Intn(256))
+	r2 = byte(rand.Intn(256))
+	g2 = byte(rand.Intn(256))
+	b2 = byte(rand.Intn(256))
 }
 
 func AddRiverDots() {
@@ -53,9 +69,9 @@ func AddRiverDots() {
 		//fmt.Println(rightEdge[0]-leftEdge[0], rightEdge[0], leftEdge[0])
 		rd.X = leftEdge[0] + rand.Intn(rightEdge[0]-leftEdge[0])
 		rd.Y = 0
-		rd.C = color.RGBA{R: 0, G: 255, B: 255, A: 0xff}
+		rd.C = color.RGBA{R: r1, G: g1, B: b1, A: 0xff}
 		if rand.Intn(2) == 0 {
-			rd.C = color.RGBA{R: 255, G: 0, B: 255, A: 0xff}
+			rd.C = color.RGBA{R: r2, G: g2, B: b2, A: 0xff}
 		}
 		riverDots = append(riverDots, &rd)
 		if i > 60 {
@@ -87,6 +103,9 @@ func MoveDotsDownRiver(dc *gg.Context) {
 					dot.X = leftEdge[dot.Y] + rand.Intn(delta)
 				}
 			}
+		}
+		if rand.Intn(40) == 0 {
+			ChangeColors()
 		}
 		if rand.Intn(20) == 0 {
 			AddRiverDots()

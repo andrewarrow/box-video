@@ -39,7 +39,7 @@ func MakeBang() {
 		rd.Move = 3
 		rd.C = colors[rand.Intn(33)]
 		rd.SingleC = int(rd.C.R) + int(rd.C.G) + int(rd.C.B)
-		rd.StringC = fmt.Sprintf("%03d%03d%03d", rc.C.R, rc.C.G, rc.C.B)
+		rd.StringC = fmt.Sprintf("%03d%03d%03d", rd.C.R, rd.C.G, rd.C.B)
 		riverDots = append(riverDots, &rd)
 		if i > 921600 {
 			break

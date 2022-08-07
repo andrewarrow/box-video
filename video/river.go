@@ -13,6 +13,7 @@ type RiverDot struct {
 	Y       int
 	C       color.RGBA
 	SingleC int
+	StringC string
 	GoalX   int
 	GoalY   int
 	Move    int

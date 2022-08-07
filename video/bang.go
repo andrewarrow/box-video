@@ -21,9 +21,13 @@ func MakeBang() {
 	y := HD_H / 2.0
 
 	colors := []color.RGBA{}
-	for i := 0; i < 1024; i++ {
+	for i := 0; len(colors) < 1024; i++ {
 		ChangeColors()
 		c := color.RGBA{R: r1, G: g1, B: b1, A: 0xff}
+		if c.R < 33 || c.G < 33 || c.B < 33 {
+			continue
+		}
+
 		colors = append(colors, c)
 	}
 
@@ -41,12 +45,13 @@ func MakeBang() {
 		}
 		i++
 	}
-	sort.SliceStable(riverDots, func(i, j int) bool {
-		return riverDots[i].SingleC > riverDots[j].SingleC
+	copyOfDots := riverDots
+	sort.SliceStable(copyOfDots, func(i, j int) bool {
+		return copyOfDots[i].SingleC > copyOfDots[j].SingleC
 	})
 	goalX := 0
 	goalY := 0
-	for _, r := range riverDots {
+	for _, r := range copyOfDots {
 		r.GoalX = goalX
 		r.GoalY = goalY
 		goalX++
@@ -86,7 +91,7 @@ func MoveBangDots(dc *gg.Context) {
 				}
 				dot.Move++
 			} else {
-				unit := rand.Intn(9)
+				unit := rand.Intn(2)
 				if dot.X > dot.GoalX {
 					dot.X -= unit
 				}

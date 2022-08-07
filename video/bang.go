@@ -21,10 +21,13 @@ func MakeBang() {
 	y := HD_H / 2.0
 
 	colors := []color.RGBA{}
-	for i := 0; len(colors) < 33; i++ {
+	for i := 0; len(colors) < 12; i++ {
 		ChangeColors()
 		c := color.RGBA{R: r1, G: g1, B: b1, A: 0xff}
 		if c.R < 99 && c.G < 99 && c.B < 99 {
+			continue
+		}
+		if c.R > 200 && c.G > 200 && c.B > 200 {
 			continue
 		}
 
@@ -37,11 +40,11 @@ func MakeBang() {
 		rd.X = int(x)
 		rd.Y = int(y)
 		rd.Move = 3
-		rd.C = colors[rand.Intn(33)]
+		rd.C = colors[rand.Intn(12)]
 		rd.SingleC = int(rd.C.R) + int(rd.C.G) + int(rd.C.B)
 		rd.StringC = fmt.Sprintf("%03d%03d%03d", rd.C.R, rd.C.G, rd.C.B)
 		riverDots = append(riverDots, &rd)
-		if i > 921600 {
+		if i > HD_W*HD_H {
 			break
 		}
 		i++

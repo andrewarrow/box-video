@@ -8,8 +8,8 @@ import (
 	"github.com/golang/freetype/raster"
 )
 
-const HD_W = 1280 //1920
-const HD_H = 720  //1080
+const HD_W = 1280 / 4 //1920
+const HD_H = 720 / 4  //1080
 
 var DotSize = 6.0
 var lastPoints []gg.Point

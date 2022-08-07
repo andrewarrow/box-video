@@ -9,10 +9,14 @@ import (
 )
 
 type RiverDot struct {
-	X     int
-	Y     int
-	C     color.RGBA
-	Label string
+	X       int
+	Y       int
+	C       color.RGBA
+	SingleC int
+	GoalX   int
+	GoalY   int
+	Move    int
+	Label   string
 }
 
 var leftEdge map[int]int

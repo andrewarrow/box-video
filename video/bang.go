@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image/color"
 	"math/rand"
+	"sort"
 
 	"github.com/fogleman/gg"
 )
@@ -11,6 +12,7 @@ import (
 // 1280 x 720 = 921,600
 
 // / 900 = 1024
+var bangEdge = false
 
 func MakeBang() {
 	RmRfBang()
@@ -30,18 +32,34 @@ func MakeBang() {
 		rd := RiverDot{}
 		rd.X = int(x)
 		rd.Y = int(y)
+		rd.Move = 3
 		rd.C = colors[rand.Intn(1024)]
+		rd.SingleC = int(rd.C.R) + int(rd.C.G) + int(rd.C.B)
 		riverDots = append(riverDots, &rd)
 		if i > 921600 {
 			break
 		}
 		i++
 	}
+	sort.SliceStable(riverDots, func(i, j int) bool {
+		return riverDots[i].SingleC > riverDots[j].SingleC
+	})
+	goalX := 0
+	goalY := 0
+	for _, r := range riverDots {
+		r.GoalX = goalX
+		r.GoalY = goalY
+		goalX++
+		if goalX > int(HD_W) {
+			goalY++
+			goalX = 0
+		}
+	}
 	dc := gg.NewContext(HD_W, HD_H)
 	dc.SetRGB(0, 0, 0)
 	dc.Clear()
 	MoveBangDots(dc)
-	ffmpeg("18")
+	ffmpeg("9")
 
 }
 
@@ -52,21 +70,41 @@ func MoveBangDots(dc *gg.Context) {
 			dotColor = dot.C
 			ColorSizeDot(c, float64(dot.X), float64(dot.Y), 1)
 
-			xr := rand.Intn(10)
-			if rand.Intn(2) == 0 {
-				xr = xr * -1
+			if bangEdge == false {
+				xr := rand.Intn(dot.Move)
+				if rand.Intn(2) == 0 {
+					xr = xr * -1
+				}
+				yr := rand.Intn(dot.Move)
+				if rand.Intn(2) == 0 {
+					yr = yr * -1
+				}
+				dot.X += xr
+				dot.Y += yr
+				if dot.Y > int(HD_H) || dot.Y < 0 {
+					bangEdge = true
+				}
+				dot.Move++
+			} else {
+				unit := rand.Intn(9)
+				if dot.X > dot.GoalX {
+					dot.X -= unit
+				}
+				if dot.Y > dot.GoalY {
+					dot.Y -= unit
+				}
+				if dot.X < dot.GoalX {
+					dot.X += unit
+				}
+				if dot.Y < dot.GoalY {
+					dot.Y += unit
+				}
 			}
-			yr := rand.Intn(10)
-			if rand.Intn(2) == 0 {
-				yr = yr * -1
-			}
-			dot.X += xr
-			dot.Y += yr
 		}
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))
 		frameCount++
 		fmt.Println(frameCount)
-		if frameCount > 10 {
+		if frameCount > 400 {
 			break
 		}
 	}

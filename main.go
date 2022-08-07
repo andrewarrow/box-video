@@ -48,6 +48,8 @@ func main() {
 		video.MakeVibration()
 	} else if command == "river" {
 		video.MakeRiver()
+	} else if command == "bang" {
+		video.MakeBang()
 	} else if command == "frames" {
 		file := os.Args[2]
 		name := os.Args[3]

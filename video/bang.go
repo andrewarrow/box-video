@@ -24,7 +24,7 @@ func MakeBang() {
 	for i := 0; len(colors) < 1024; i++ {
 		ChangeColors()
 		c := color.RGBA{R: r1, G: g1, B: b1, A: 0xff}
-		if c.R < 33 || c.G < 33 || c.B < 33 {
+		if c.R < 99 && c.G < 99 && c.B < 99 {
 			continue
 		}
 
@@ -45,7 +45,10 @@ func MakeBang() {
 		}
 		i++
 	}
-	copyOfDots := riverDots
+	copyOfDots := []*RiverDot{}
+	for _, r := range riverDots {
+		copyOfDots = append(copyOfDots, r)
+	}
 	sort.SliceStable(copyOfDots, func(i, j int) bool {
 		return copyOfDots[i].SingleC > copyOfDots[j].SingleC
 	})

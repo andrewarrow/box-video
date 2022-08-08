@@ -74,6 +74,14 @@ func MakeBang() {
 	ffmpeg("9")
 
 }
+func ResetGoals() {
+	x := HD_W / 2.0
+	y := HD_H / 2.0
+	for _, r := range riverDots {
+		r.GoalX = int(x)
+		r.GoalY = int(y)
+	}
+}
 
 func AllGoalsMeet() bool {
 	val := true
@@ -125,11 +133,8 @@ func MoveBangDots(dc *gg.Context) {
 					dot.Y += unit
 				}
 				if AllGoalsMeet() {
-					bangEdge = 2
+					ResetGoals()
 				}
-			} else if bangEdge == 2 {
-				dot.X--
-				dot.Y--
 			}
 		}
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))

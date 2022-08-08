@@ -12,7 +12,7 @@ import (
 // 1280 x 720 = 921,600
 
 // / 900 = 1024
-var bangEdge = false
+var bangEdge = 0
 
 func MakeBang() {
 	RmRfBang()
@@ -42,7 +42,7 @@ func MakeBang() {
 		rd.Move = 3
 		rd.C = colors[rand.Intn(12)]
 		rd.SingleC = int(rd.C.R) + int(rd.C.G) + int(rd.C.B)
-		rd.StringC = fmt.Sprintf("%03d%03d%03d", rd.C.R, rd.C.G, rd.C.B)
+		rd.StringC = fmt.Sprintf("%02x%02x%02x", rd.C.R, rd.C.G, rd.C.B)
 		riverDots = append(riverDots, &rd)
 		if i > HD_W*HD_H {
 			break
@@ -75,6 +75,17 @@ func MakeBang() {
 
 }
 
+func AllGoalsMeet() bool {
+	val := true
+	for _, r := range riverDots {
+		if r.X != r.GoalX || r.Y != r.GoalY {
+			return false
+		}
+	}
+
+	return val
+}
+
 func MoveBangDots(dc *gg.Context) {
 	for {
 		c := gg.NewContextForImage(dc.Image())
@@ -82,7 +93,7 @@ func MoveBangDots(dc *gg.Context) {
 			dotColor = dot.C
 			ColorSizeDot(c, float64(dot.X), float64(dot.Y), 1)
 
-			if bangEdge == false {
+			if bangEdge == 0 {
 				xr := rand.Intn(dot.Move)
 				if rand.Intn(2) == 0 {
 					xr = xr * -1
@@ -94,10 +105,12 @@ func MoveBangDots(dc *gg.Context) {
 				dot.X += xr
 				dot.Y += yr
 				if dot.Y > int(HD_H) || dot.Y < 0 {
-					bangEdge = true
+					bangEdge = 1
 				}
-				dot.Move++
-			} else {
+				if rand.Intn(729) == 0 {
+					dot.Move++
+				}
+			} else if bangEdge == 1 {
 				unit := rand.Intn(2) + 1
 				if dot.X > dot.GoalX {
 					dot.X -= unit
@@ -111,6 +124,12 @@ func MoveBangDots(dc *gg.Context) {
 				if dot.Y < dot.GoalY {
 					dot.Y += unit
 				}
+				if AllGoalsMeet() {
+					bangEdge = 2
+				}
+			} else if bangEdge == 2 {
+				dot.X--
+				dot.Y--
 			}
 		}
 		c.SavePNG(fmt.Sprintf("data/img%07d.png", frameCount))

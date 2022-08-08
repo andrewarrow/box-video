@@ -24,10 +24,10 @@ func MakeBang() {
 	for i := 0; len(colors) < 12; i++ {
 		ChangeColors()
 		c := color.RGBA{R: r1, G: g1, B: b1, A: 0xff}
-		if c.R < 99 && c.G < 99 && c.B < 99 {
+		if c.R < 9 && c.G < 9 && c.B < 9 {
 			continue
 		}
-		if c.R > 200 && c.G > 200 && c.B > 200 {
+		if c.R > 240 && c.G > 240 && c.B > 240 {
 			continue
 		}
 
@@ -98,7 +98,7 @@ func MoveBangDots(dc *gg.Context) {
 				}
 				dot.Move++
 			} else {
-				unit := rand.Intn(2)
+				unit := rand.Intn(2) + 1
 				if dot.X > dot.GoalX {
 					dot.X -= unit
 				}
